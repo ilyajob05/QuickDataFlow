@@ -7,6 +7,7 @@
 #include <string>
 #include <iostream>
 #include <cstring>
+#include <gtest/gtest.h>
 
 #include "shm_message.hpp"
 
@@ -18,8 +19,7 @@ void idle(std::atomic_bool *event_exit)
     event_exit->store(true);
 }
 
-/// spin node for push model
-int main(int argc, char* argv[]) {
+TEST(MessageBuffTest, MessageBuffSendRecv){
     using namespace fshm;
     using namespace std;
     char element1[1000];
@@ -47,5 +47,13 @@ int main(int argc, char* argv[]) {
     cout << msg_buff.input_message_complete.load() << endl;
     cout << endl;
 
-    return 0;
+    EXPECT_TRUE(0 == std::memcmp(element1, element2, sizeof(element1)));
+
+}
+
+
+/// spin node for push model
+int main(int argc, char* argv[]) {
+    testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
 }
