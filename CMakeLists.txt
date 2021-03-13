@@ -17,10 +17,7 @@ set(CMAKE_CXX_FLAGS_DEBUG "-O0")
 ################# Add gtest environment #################
 enable_testing()
 find_package(GTest REQUIRED)
-# add gtest include directory: way 1
 include_directories(${GTest_INCLUDE_DIRS})
-# add gtest include directory: way 2
-#include_directories(${GTest_SOURCE_DIRS}/include ${GTest_SOURCE_DIR})
 
 
 ################# source config #################
@@ -32,12 +29,21 @@ file(GLOB SRC_LIST "src/*.cpp")
 
 
 ################# create executable app #################
-add_executable(${CMAKE_PROJECT_NAME} main.cpp ${SRC_LIST})
+add_executable(${CMAKE_PROJECT_NAME} example.cpp ${SRC_LIST})
 
 
 ################# link connect #################
 target_link_libraries(${CMAKE_PROJECT_NAME} -lrt -lpthread -lgtest)
 
 
+################# create executable test #################
+add_executable(${CMAKE_PROJECT_NAME}_test test.cpp ${SRC_LIST})
+
+
+################# link connect for test #################
+target_link_libraries(${CMAKE_PROJECT_NAME}_test -lrt -lpthread -lgtest)
+
+
 ################# create gtest targets #################
-add_test(AllTest, ${CMAKE_PROJECT_NAME})
+add_test(${CMAKE_PROJECT_NAME}_test, ${CMAKE_PROJECT_NAME}_test)
+
