@@ -1,0 +1,207 @@
+#include <malloc.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <errno.h>
+
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <memory.h>
+
+#include "shm_message.hpp"
+
+
+using namespace std;
+
+namespace fshm {
+
+MessageBuff::~MessageBuff()
+{
+    thr_in_event_exit.store(true);
+    thr_out_event_exit.store(true);
+    thr_idle_event_exit.store(true);
+
+
+    queue_input->mem->read_index = 0;
+    queue_output->mem->read_index = 0;
+
+    output_message_waiter.unlock();
+    input_message_waiter.unlock();
+//    read_from_input(this, mem_dst_element);
+//    write_to_out(this, mem_src_element);
+
+    if(th_reader_input.joinable())
+        th_reader_input.join();
+    if(th_writer_out.joinable())
+        th_writer_out.join();
+//    if(th_idle.joinable())
+//        th_idle.join();
+
+    shmemq_destroy(queue_input, 1);
+    shmemq_destroy(queue_output, 1);
+//    free(buffPtr);
+}
+
+MessageBuff::MessageBuff(const char *shm_src_name, const char *shm_dst_name,
+                         void *mem_src_element_, void *mem_dst_element_,
+                         const size_t q_size_in_, const size_t q_size_out_,
+                         const size_t element_size_in_, const size_t element_size_out_) :
+    input_message_complete(false), output_message_complete(false),
+    mem_src_element{mem_src_element_}, mem_dst_element{mem_dst_element_},
+    shm_in_name{shm_src_name}, shm_out_name{shm_dst_name},
+    q_size_in{q_size_in_}, q_size_out{q_size_out_},
+    element_size_in{element_size_in_}, element_size_out{element_size_out_}
+{
+    //    buffPtr = memalign(alignof(int), len);
+
+    input_message_waiter.lock();
+    output_message_waiter.lock();
+
+    queue_input = shmemq_new(shm_in_name, q_size_in, element_size_in);
+    queue_output = shmemq_new(shm_out_name, q_size_out, element_size_out);
+
+    th_reader_input = thread(read_from_input, this, mem_dst_element);
+    th_writer_out = thread(write_to_out, this, mem_src_element);
+}
+
+void MessageBuff::read_from_input(MessageBuff *self, void *mem_dst_element)
+{
+    //todo:
+    while(!self->thr_in_event_exit.load())
+    {
+        self->input_message_waiter.lock();
+        self->input_message_complete.store(false);
+        // for exit from task
+        self->shmemq_try_dequeue(self->queue_input, mem_dst_element, self->element_size_in);
+        self->input_message_complete.store(true);
+    }
+}
+
+void MessageBuff::write_to_out(MessageBuff *self, void *mem_src_element)
+{
+    //todo:
+    while(!self->thr_out_event_exit.load())
+    {
+        self->output_message_waiter.lock();
+        self->output_message_complete.store(false);
+        self->shmemq_try_enqueue(self->queue_input, mem_src_element, self->element_size_in);
+        self->output_message_complete.store(true);
+    }
+}
+
+void MessageBuff::clear_shmem_attr(shmemq_t *shmem)
+{
+    if (shmem->shmem_fd != -1) {
+        close(shmem->shmem_fd);
+        shm_unlink(shmem->name);
+    }
+    free(shmem->name);
+    free(shmem);
+}
+
+MessageBuff::shmemq_t* MessageBuff::shmemq_new(char const* name, size_t q_size, size_t element_size) {
+    shmemq_t* self;
+    bool created;
+
+    self = (shmemq_t*)malloc(sizeof(shmemq_t));
+    self->max_count = q_size;
+    self->element_size = element_size;
+    self->max_size = q_size * element_size;
+    self->name = strdup(name);
+    self->mmap_size = self->max_size + sizeof(struct shmemq_info) - 1;
+
+    created = false;
+    self->shmem_fd = shm_open(name, O_RDWR, S_IRUSR | S_IWUSR);
+    if (self->shmem_fd == -1) {
+        if (errno == ENOENT) {
+            self->shmem_fd = shm_open(name, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+            if (self->shmem_fd == -1) {
+                clear_shmem_attr(self);
+                return NULL;
+            }
+            created = true;
+        } else {
+            clear_shmem_attr(self);
+            return NULL;
+        }
+    }
+    printf("initialized queue %s, created = %d\n", name, created);
+    if (created && (-1 == ftruncate(self->shmem_fd, self->mmap_size))){
+        clear_shmem_attr(self);
+        return NULL;
+    }
+
+    self->mem = (struct shmemq_info*)mmap(NULL, self->mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, self->shmem_fd, 0);
+    if (self->mem == MAP_FAILED){
+        clear_shmem_attr(self);
+        return NULL;
+    }
+    if (created) {
+        self->mem->read_index = self->mem->write_index = 0;
+        pthread_mutexattr_t attr;
+        pthread_mutexattr_init(&attr);
+        pthread_mutexattr_setpshared(&attr, PTHREAD_PROCESS_SHARED);
+#if ADAPTIVE_MUTEX
+        // depricated
+        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_ADAPTIVE_NP);
+#endif
+        pthread_mutex_init(&self->mem->lock, &attr);
+        pthread_mutexattr_destroy(&attr);
+        // TODO Need to clean up the mutex? Also, maybe mark it as robust? (pthread_mutexattr_setrobust)
+    }
+
+    return self;
+}
+
+bool MessageBuff::shmemq_try_enqueue(shmemq_t* self, void* src, unsigned int len) {
+    if (len != self->element_size)
+        return false;
+
+    pthread_mutex_lock(&self->mem->lock);
+
+    // TODO this test needs to take overflow into account
+  if (self->mem->write_index - self->mem->read_index >= self->max_size) {
+        pthread_mutex_unlock(&self->mem->lock);
+        return false; // There is no more room in the queue
+    }
+
+    memcpy(&self->mem->data[self->mem->write_index % self->max_size], src, len);
+    self->mem->write_index += self->element_size;
+
+    pthread_mutex_unlock(&self->mem->lock);
+    return true;
+}
+
+bool MessageBuff::shmemq_try_dequeue(shmemq_t* self, void* dst, unsigned int len) {
+    if (len != self->element_size)
+        return false;
+
+    pthread_mutex_lock(&self->mem->lock);
+
+    // TODO this test needs to take overflow into account
+    if (self->mem->read_index >= self->mem->write_index) {
+        pthread_mutex_unlock(&self->mem->lock);
+        return false; // There are no elements that haven't been consumed yet
+    }
+
+    memcpy(dst, &self->mem->data[self->mem->read_index % self->max_size], len);
+    self->mem->read_index += self->element_size;
+
+    pthread_mutex_unlock(&self->mem->lock);
+    return true;
+}
+
+void MessageBuff::shmemq_destroy(shmemq_t* self, int unlink) {
+    munmap(self->mem, self->max_size);
+    close(self->shmem_fd);
+    if (unlink) {
+        shm_unlink(self->name);
+    }
+    free(self->name);
+    free(self);
+}
+}
