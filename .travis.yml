@@ -55,10 +55,12 @@ install:
         travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C ${DEPS_DIR}/cmake
         export PATH=${DEPS_DIR}/cmake/bin:${PATH}
       fi
+
+before_script:
     - cd /usr/src/gtest
     - sudo cmake .
     - sudo cmake --build . --target install
-
+  
 script:
     ############################################################################
     # Build main and tests
@@ -71,4 +73,4 @@ script:
 
 
 after_success:
-    - codecov -t c376990f-2ad6-4f7b-bbdb-5378a52e295c -X gcov
+    # - codecov -t c376990f-2ad6-4f7b-bbdb-5378a52e295c -X gcov
