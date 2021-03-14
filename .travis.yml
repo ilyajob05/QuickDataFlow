@@ -4,7 +4,7 @@ sudo: true
 env:
   global:
     # Ubuntu version
-    - LINUX_DIST=trusty
+    - LINUX_DIST=focal
     - DEPS_DIR=${TRAVIS_BUILD_DIR}/deps
     # Global build options and C++ flags
     - CXX_FLAGS="-Wall -pedantic -Werror -Wno-variadic-macros -Wno-long-long -Wno-shadow"
@@ -90,17 +90,21 @@ install:
 #     - cmake --build . --target install
 
 script:
+    - export CC=gcc-7
+    - export CXX=g++-7
+    - cmake --version
+    - cmake CMakeLists.txt
+    - cmake  --build .
     ############################################################################
     # Build main and tests
     ############################################################################
-     - mkdir -p build
-     - ls
-     - cd build
-     - cmake ${CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DCMAKE_BUILD_TYPE=Coverage -DBUILD_TESTS=ON .. 
-     - make all
-     - make test
-     - ls
-
+#     - mkdir -p build && \
+#     ls && \
+#     cd build && \
+#     cmake ${CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DCMAKE_BUILD_TYPE=Coverage -DBUILD_TESTS=ON ..  && \
+#     make all && \
+#     make test && \
+#     ls
 
 after_success:
     # - codecov -t c376990f-2ad6-4f7b-bbdb-5378a52e295c -X gcov
