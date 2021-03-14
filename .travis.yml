@@ -22,7 +22,7 @@ install:
     - sudo apt-get install libgtest-dev
     - cmake -DCMAKE_BUILD_TYPE=Release /usr/src/gtest
     - cmake --build .
-    - sudo mv lib*.a /usr/lib
+    - sudo mv lib/lib*.a /usr/lib
     - rm CMakeCache.txt cmake_install.cmake Makefile
     - rm -rf CMakeFiles
     - echo ${PATH}
