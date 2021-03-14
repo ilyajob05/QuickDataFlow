@@ -67,10 +67,10 @@ install:
     - git clone https://github.com/google/googletest.git
     - cd googletest
     - mkdir build && cd build
-    - cmake .. -GNinja -DBUILD_SHARED_LIBS=OFF -DINSTALL_GTEST=ON -DCMAKE_INSTALL_PREFIX:PATH=/usr
-    - cmake --build .
-    - sudo cmake --install .
-    - sudo ldconfig
+    - cmake .. -DBUILD_SHARED_LIBS=OFF -DINSTALL_GTEST=ON -DCMAKE_INSTALL_PREFIX:PATH=/usr
+    - make
+    - make install
+    - ldconfig
 
 
     - echo ${PATH}
