@@ -94,10 +94,12 @@ script:
     # Build main and tests
     ############################################################################
      - mkdir -p build
+     - ls
      - cd build
      - cmake ${CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DCMAKE_BUILD_TYPE=Coverage -DBUILD_TESTS=ON .. 
-     - make
+     - make all
      - make test
+     - ls
 
 
 after_success:
