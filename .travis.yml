@@ -67,13 +67,15 @@ script:
     - export CC=gcc-7
     - export CXX=g++-7
     - cmake --version
+    - rm CMakeCache.txt
     - ls
     - pwd
     - mkdir build
     - cd build
     - pwd
-    - cmake ..
-    - cmake  --build .
+    - cmake -DBUILD_TESTS=ON ..
+    - make
+    - make test
     ############################################################################
     # Build main and tests
     ############################################################################
