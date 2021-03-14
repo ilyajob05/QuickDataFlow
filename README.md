@@ -2,6 +2,7 @@
 
 [![Travis Build Status](https://travis-ci.com/ilyajob05/QickDataFlow.svg?branch=main)](https://travis-ci.com/ilyajob05/QickDataFlow)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ilyajob05/QickDataFlow/main/LICENSE)
+[![codecov](https://codecov.io/gh/ilyajob05/QickDataFlow/branch/main/graph/badge.svg?token=T2M14V6SK8)](https://codecov.io/gh/ilyajob05/QickDataFlow)
 
 This library is for building multithreaded and fast C ++ applications
 
