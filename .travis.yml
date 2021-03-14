@@ -58,9 +58,9 @@ install:
 
 before_script:
     - cd /usr/src/gtest
-    - sudo cmake .
-    - sudo cmake --build . --target install
-  
+    - cmake .
+    - cmake --build . --target install
+
 script:
     ############################################################################
     # Build main and tests
