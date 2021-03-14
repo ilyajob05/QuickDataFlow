@@ -13,26 +13,24 @@ env:
 
 matrix:
   include:
-    - os: linux
-      dist: trusty
-      sudo: true
-      compiler: gcc
-      addons:
-       apt:
-         packages: &precise_latest_boost_packages
-           - gcc-4.8
-           - g++-4.8
-           #- gcov-4.9
-           - clang-3.7
-           - valgrind
-           # Misc
-           - python-yaml
-           - lcov
-           # - libopencv-dev
-           - libgtest-dev
-         sources: &precise_latest_boost_sources
-           - ubuntu-toolchain-r-test
-           - llvm-toolchain-precise-3.7
+      - compiler: gcc
+        addons:
+         apt:
+           packages: &precise_latest_boost_packages
+             - gcc-4.8
+             - g++-4.8
+             #- gcov-4.9
+             - clang-3.7
+             - valgrind
+             # Misc
+             - python-yaml
+             - lcov
+             # - libopencv-dev
+             - libgtest-dev
+           sources: &precise_latest_boost_sources
+             - ubuntu-toolchain-r-test
+             - llvm-toolchain-precise-3.7
+        env: COMPILER=g++-6
     
 before_install:
     # Combine global build options with OS/compiler-dependent options
@@ -55,6 +53,25 @@ install:
         travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C ${DEPS_DIR}/cmake
         export PATH=${DEPS_DIR}/cmake/bin:${PATH}
       fi
+
+    # - apt-get install libgtest-dev
+    # - apt-get install cmake # install cmake
+    # - cd /usr/src/gtest
+    # - cmake CMakeLists.txt
+    # - make
+    # - cp *.a /usr/lib
+    # - ln -s /usr/lib/libgtest.a /usr/local/lib/gtest/libgtest.a
+    # - ln -s /usr/lib/libgtest_main.a /usr/local/lib/gtest/libgtest_main.a
+
+
+    - git clone https://github.com/google/googletest.git
+    - cd googletest
+    - mkdir build && cd build
+    - cmake .. -GNinja -DBUILD_SHARED_LIBS=OFF -DINSTALL_GTEST=ON -DCMAKE_INSTALL_PREFIX:PATH=/usr
+    - cmake --build .
+    - sudo cmake --install .
+    - sudo ldconfig
+
 
     - echo ${PATH}
     - echo ${CXX}

@@ -33,7 +33,7 @@ add_executable(${CMAKE_PROJECT_NAME} example.cpp ${SRC_LIST})
 
 
 ################# link connect #################
-target_link_libraries(${CMAKE_PROJECT_NAME} -lrt -lpthread -lgtest)
+target_link_libraries(${CMAKE_PROJECT_NAME} -lrt -lpthread)
 
 
 ################# create executable test #################
@@ -41,8 +41,8 @@ add_executable(${CMAKE_PROJECT_NAME}_test test.cpp ${SRC_LIST})
 
 
 ################# link connect for test #################
-target_link_libraries(${CMAKE_PROJECT_NAME}_test -lrt -lpthread -lgtest)
-
+#target_link_libraries(${CMAKE_PROJECT_NAME}_test -lrt -lpthread ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES})
+target_link_libraries(${CMAKE_PROJECT_NAME}_test -lrt -lpthread GTest::GTest GTest::Main)
 
 ################# create gtest targets #################
 add_test(${CMAKE_PROJECT_NAME}_test, ${CMAKE_PROJECT_NAME}_test)
