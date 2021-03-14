@@ -1,7 +1,7 @@
 language: cpp
 compiler: gcc
 
-os: linux
+dist: focal
 addons:
   apt:
     sources:
@@ -19,39 +19,12 @@ install:
     - ${CXX} --version
     - ${CXX} -v
     - sudo pip install codecov
-    
-#    # Download and install recent cmake
-#    - |
-#      if [[ ${TRAVIS_OS_NAME} == "linux" ]]; then
-#        CMAKE_URL="http://www.cmake.org/files/v3.5/cmake-3.5.1-Linux-x86_64.tar.gz"
-#        mkdir -p ${DEPS_DIR}/cmake
-#        travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C ${DEPS_DIR}/cmake
-#        export PATH=${DEPS_DIR}/cmake/bin:${PATH}
-#      fi
-
     - sudo apt-get install libgtest-dev
     - cmake -DCMAKE_BUILD_TYPE=Release /usr/src/gtest
     - cmake --build .
     - sudo mv lib*.a /usr/lib
-
-    # - apt-get install cmake # install cmake
-    # - cd /usr/src/gtest
-    # - cmake CMakeLists.txt
-    # - make
-    # - cp *.a /usr/lib
-    # - ln -s /usr/lib/libgtest.a /usr/local/lib/gtest/libgtest.a
-    # - ln -s /usr/lib/libgtest_main.a /usr/local/lib/gtest/libgtest_main.a
-
-
-    # - git clone https://github.com/google/googletest.git
-    # - cd googletest
-    # - mkdir build && cd build
-    # - cmake .. -DGTEST_LANG_CXX17=ON -DBUILD_SHARED_LIBS=OFF -DBUILD_GMOCK=OFF -DINSTALL_GTEST=ON -DCMAKE_INSTALL_PREFIX:PATH=/usr
-    # - make
-    # - make install
-    # - ldconfig
-
-
+    - rm CMakeCache.txt cmake_install.cmake Makefile
+    - rm -rf CMakeFiles
     - echo ${PATH}
     - echo ${CXX}
     - ${CXX} --version
@@ -59,33 +32,16 @@ install:
     - cmake --version
 
 # before_script:
-#     - cd /usr/src/googletest
-#     - cmake .
-#     - cmake --build . --target install
 
 script:
     - export CC=gcc-7
     - export CXX=g++-7
     - cmake --version
-    - rm CMakeCache.txt
-    - ls
-    - pwd
     - mkdir build
     - cd build
-    - pwd
     - cmake -DBUILD_TESTS=ON ..
     - make
     - make test
-    ############################################################################
-    # Build main and tests
-    ############################################################################
-#     - mkdir -p build && \
-#     ls && \
-#     cd build && \
-#     cmake ${CMAKE_OPTIONS} -DCMAKE_CXX_FLAGS=${CXX_FLAGS} -DCMAKE_BUILD_TYPE=Coverage -DBUILD_TESTS=ON ..  && \
-#     make all && \
-#     make test && \
-#     ls
 
 after_success:
     # - codecov -t c376990f-2ad6-4f7b-bbdb-5378a52e295c -X gcov
