@@ -1,4 +1,7 @@
 # QickDataFlow
+
+[![Travis Build Status](https://travis-ci.com/ilyajob05/QickDataFlow.svg?branch=main)](https://travis-ci.com/ilyajob05/QickDataFlow)
+
 This library is for building multithreaded and fast C ++ applications
 
 ## Requirements
