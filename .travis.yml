@@ -67,7 +67,7 @@ install:
     - git clone https://github.com/google/googletest.git
     - cd googletest
     - mkdir build && cd build
-    - cmake .. -DBUILD_SHARED_LIBS=OFF -DBUILD_GMOCK=OFF -DINSTALL_GTEST=ON -DCMAKE_INSTALL_PREFIX:PATH=/usr
+    - cmake .. -DGTEST_LANG_CXX17 -DBUILD_SHARED_LIBS=OFF -DBUILD_GMOCK=OFF -DINSTALL_GTEST=ON -DCMAKE_INSTALL_PREFIX:PATH=/usr
     - make
     - make install
     - ldconfig
