@@ -38,9 +38,6 @@ before_install:
     # Combine global build options with OS/compiler-dependent options
     - export CMAKE_OPTIONS=${CMAKE_OPTIONS}" "${ENV_CMAKE_OPTIONS}
     - export CXX_FLAGS=${CXX_FLAGS}" "${ENV_CXX_FLAGS}
-    - cd /usr/src/gtest
-    - sudo cmake .
-    - sudo cmake --build . --target install
 
 install:
     - if [ "$CXX" = "clang++" ] && [ "$TRAVIS_OS_NAME" = "linux" ]; then export CXX="clang++-3.7" CC="clang-3.7"; fi
@@ -58,6 +55,10 @@ install:
         travis_retry wget --no-check-certificate --quiet -O - ${CMAKE_URL} | tar --strip-components=1 -xz -C ${DEPS_DIR}/cmake
         export PATH=${DEPS_DIR}/cmake/bin:${PATH}
       fi
+    - cd /usr/src/gtest
+    - sudo cmake .
+    - sudo cmake --build . --target install
+
 script:
     ############################################################################
     # Build main and tests
