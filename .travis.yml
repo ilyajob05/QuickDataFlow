@@ -55,10 +55,10 @@ install:
         export PATH=${DEPS_DIR}/cmake/bin:${PATH}
       fi
 
-    - apt-get install libgtest-dev
-    - cmake -DCMAKE_BUILD_TYPE=Release /usr/src/gtest
-    - cmake --build .
-    - mv lib*.a /usr/lib
+    - sudo apt-get install libgtest-dev
+    - sudo cmake -DCMAKE_BUILD_TYPE=Release /usr/src/gtest
+    - sudo cmake --build .
+    - sudo mv lib*.a /usr/lib
 
     # - apt-get install cmake # install cmake
     # - cd /usr/src/gtest
