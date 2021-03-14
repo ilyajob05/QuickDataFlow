@@ -1,4 +1,5 @@
 language: cpp
+sudo: false
 
 env:
   global:
@@ -54,7 +55,11 @@ install:
         export PATH=${DEPS_DIR}/cmake/bin:${PATH}
       fi
 
-    # - apt-get install libgtest-dev
+    - apt-get install libgtest-dev
+    - cmake -DCMAKE_BUILD_TYPE=Release /usr/src/gtest
+    - cmake --build .
+    - mv lib*.a /usr/lib
+
     # - apt-get install cmake # install cmake
     # - cd /usr/src/gtest
     # - cmake CMakeLists.txt
@@ -64,13 +69,13 @@ install:
     # - ln -s /usr/lib/libgtest_main.a /usr/local/lib/gtest/libgtest_main.a
 
 
-    - git clone https://github.com/google/googletest.git
-    - cd googletest
-    - mkdir build && cd build
-    - cmake .. -DGTEST_LANG_CXX17=ON -DBUILD_SHARED_LIBS=OFF -DBUILD_GMOCK=OFF -DINSTALL_GTEST=ON -DCMAKE_INSTALL_PREFIX:PATH=/usr
-    - make
-    - make install
-    - ldconfig
+    # - git clone https://github.com/google/googletest.git
+    # - cd googletest
+    # - mkdir build && cd build
+    # - cmake .. -DGTEST_LANG_CXX17=ON -DBUILD_SHARED_LIBS=OFF -DBUILD_GMOCK=OFF -DINSTALL_GTEST=ON -DCMAKE_INSTALL_PREFIX:PATH=/usr
+    # - make
+    # - make install
+    # - ldconfig
 
 
     - echo ${PATH}
