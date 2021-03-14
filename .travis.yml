@@ -57,7 +57,7 @@ install:
       fi
 
 before_script:
-    - cd /usr/src/gtest
+    - cd /usr/src/googletest
     - cmake .
     - cmake --build . --target install
 
