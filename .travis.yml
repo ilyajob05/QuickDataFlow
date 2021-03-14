@@ -56,10 +56,16 @@ install:
         export PATH=${DEPS_DIR}/cmake/bin:${PATH}
       fi
 
-before_script:
-    - cd /usr/src/googletest
-    - cmake .
-    - cmake --build . --target install
+    - echo ${PATH}
+    - echo ${CXX}
+    - ${CXX} --version
+    - ${CXX} -v
+    - cmake --version
+
+# before_script:
+#     - cd /usr/src/googletest
+#     - cmake .
+#     - cmake --build . --target install
 
 script:
     ############################################################################
