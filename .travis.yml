@@ -56,8 +56,8 @@ install:
       fi
 
     - sudo apt-get install libgtest-dev
-    - sudo cmake -DCMAKE_BUILD_TYPE=Release /usr/src/gtest
-    - sudo cmake --build .
+    - cmake -DCMAKE_BUILD_TYPE=Release /usr/src/gtest
+    - cmake --build .
     - sudo mv lib*.a /usr/lib
 
     # - apt-get install cmake # install cmake
