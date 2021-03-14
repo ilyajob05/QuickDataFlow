@@ -93,6 +93,7 @@ script:
     - export CC=gcc-7
     - export CXX=g++-7
     - cmake --version
+    - ls
     - cmake CMakeLists.txt
     - cmake  --build .
     ############################################################################
