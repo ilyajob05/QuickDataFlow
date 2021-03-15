@@ -11,7 +11,9 @@ set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror") #treating warnings as errors
 set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuninitialized -Winit-self")
 
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
 set(CMAKE_CXX_FLAGS_DEBUG "-O0")
+set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} --coverage -fprofile-arcs -ftest-coverage")
 
 
 ################# source config #################
@@ -27,7 +29,7 @@ add_executable(${CMAKE_PROJECT_NAME} example.cpp ${SRC_LIST})
 
 
 ################# link connect #################
-target_link_libraries(${CMAKE_PROJECT_NAME} -lrt -lpthread)
+target_link_libraries(${CMAKE_PROJECT_NAME} -lrt -lpthread -lgcov)
 
 
 ################# configure for test #################
@@ -39,7 +41,7 @@ if(BUILD_TESTS)
 
     ################# create executable test #################
     add_executable(${CMAKE_PROJECT_NAME}_test test.cpp ${SRC_LIST})
-    target_link_libraries(${CMAKE_PROJECT_NAME}_test -lrt -lpthread GTest::GTest GTest::Main)
+    target_link_libraries(${CMAKE_PROJECT_NAME}_test -lrt -lpthread GTest::GTest GTest::Main -lgcov)
     #target_link_libraries(${CMAKE_PROJECT_NAME}_test -lrt -lpthread ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES})
 
     ################# create gtest targets #################
