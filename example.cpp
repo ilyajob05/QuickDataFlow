@@ -48,7 +48,9 @@ int main(int argc, char* argv[]) {
     cout << msg_buff.input_message_complete.load() << endl;
     cout << endl;
 
-    if(0 == std::memcmp(element1, element2, sizeof(element1))){
-        cout << "complete" << endl;
+    if(0 != std::memcmp(element1, element2, sizeof(element1))){
+        cout << "error" << endl;
+        return -1;
     }
+    return 0;
 }

@@ -10,6 +10,7 @@
 #include <gtest/gtest.h>
 
 #include "shm_message.hpp"
+#include "test.h"
 
 
 void idle(std::atomic_bool *event_exit)
@@ -37,6 +38,11 @@ TEST(MessageBuffTest, MessageBuffSendRecv){
     ASSERT_TRUE(0 == std::memcmp(element1, element2, sizeof(element1)));
 }
 
+TEST(Example, Example)
+{
+    char **param = nullptr;
+    ASSERT_EQ(0, main(1, param));
+}
 
 /// spin node for push model
 int main(int argc, char* argv[]) {
