@@ -28,8 +28,13 @@ int main(int argc, char* argv[]) {
     memset(element1, 7, 1000);
     memset(element2, 8, 1000);
 
+    // shmin - name of shared memory
+    // element1 memory source
+    // element2 memory destination
+    // 100 queue elements num of input
+    // 100 queue elements num of output
     MessageBuff msg_buff("shmin3", "shmin3", element1, element2, 100, 100, sizeof(element1), sizeof(element2));
-    // unlock thread for output
+    // unlock thread for write to output
     msg_buff.output_message_waiter.unlock();
     // check complete
     cout << msg_buff.output_message_complete.load() << endl;

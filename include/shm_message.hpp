@@ -30,6 +30,14 @@ public:
     const char* shm_in_name_get() const {return shm_in_name;}
     const char* shm_out_name_get() const {return shm_out_name;}
 
+    ///
+    inline void push_message_async() { output_message_waiter.unlock();
+    }
+
+    ///
+    inline void get_message_async() { input_message_waiter.unlock();
+    }
+
     virtual ~MessageBuff();
     MessageBuff(const char *shm_src_name, const char *shm_dst_name,
                 void *mem_src_element, void *mem_dst_element,
