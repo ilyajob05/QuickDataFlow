@@ -25,7 +25,7 @@ file(GLOB SRC_LIST "src/*.cpp")
 
 
 ################# create executable app #################
-add_executable(${CMAKE_PROJECT_NAME} ${PROJECT_SOURCE_DIR}/examples/example.cpp ${SRC_LIST})
+add_executable(${CMAKE_PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/examples/example.cpp ${SRC_LIST})
 
 
 ################# link connect #################
@@ -41,7 +41,7 @@ if(BUILD_TESTS)
     include_directories(${GTest_INCLUDE_DIRS})
 
     ################# create executable test #################
-    add_executable(${CMAKE_PROJECT_NAME}_test ${PROJECT_SOURCE_DIR}/tests/test.cpp ${SRC_LIST})
+    add_executable(${CMAKE_PROJECT_NAME}_test ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp ${SRC_LIST})
     target_link_libraries(${CMAKE_PROJECT_NAME}_test -lrt -lpthread GTest::GTest GTest::Main)
     #target_link_libraries(${CMAKE_PROJECT_NAME}_test -lrt -lpthread ${GTEST_LIBRARIES} ${GTEST_MAIN_LIBRARIES})
 

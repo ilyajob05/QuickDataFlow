@@ -70,9 +70,10 @@ MessageBuff::MessageBuff(const char *shm_src_name, const char *shm_dst_name,
 
 void MessageBuff::read_from_input(MessageBuff *self, void *mem_dst_element)
 {
-    //todo:
+    // main cycle of thread
     while(!self->thr_in_event_exit.load())
     {
+        // unlock input_message_waiter from external process for next step
         self->input_message_waiter.lock();
         self->input_message_complete.store(false);
         // for exit from task
@@ -83,9 +84,10 @@ void MessageBuff::read_from_input(MessageBuff *self, void *mem_dst_element)
 
 void MessageBuff::write_to_out(MessageBuff *self, void *mem_src_element)
 {
-    //todo:
+    // main cycle of thread
     while(!self->thr_out_event_exit.load())
     {
+        // unlock output_message_waiter from external process for next step
         self->output_message_waiter.lock();
         self->output_message_complete.store(false);
         self->shmemq_try_enqueue(self->queue_input, mem_src_element, self->element_size_in);
