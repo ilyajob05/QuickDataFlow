@@ -22,18 +22,18 @@ public:
     std::atomic_bool output_message_complete; /// for async write data
 
     std::vector<uint8_t> buff; /// message buffer
-    // set
-    // size_t & len()       { return len_; }
-    // get
+
     const size_t & len_get() const { return len; }
     const size_t & q_size_in_get() const {return q_size_in;}
     const char* shm_in_name_get() const {return shm_in_name;}
     const char *shm_out_name_get() const { return shm_out_name; }
 
-    ///
+    /// user freandly function
     inline void push_message_async() { output_message_waiter.unlock(); }
+    /// user freandly function
+    inline bool push_message_async_is_complete() { output_message_complete.load(); }
 
-    ///
+    /// user freandly function
     inline void push_message_sync()
     {
         output_message_waiter.unlock();
@@ -42,10 +42,12 @@ public:
         }
     }
 
-    ///
+    /// user freandly function
     inline void get_message_async() { input_message_waiter.unlock(); }
+    /// user freandly function
+    inline bool get_message_async_is_complete() { input_message_complete.load(); }
 
-    ///
+    /// user freandly function
     inline void get_message_sync()
     {
         input_message_waiter.unlock();
