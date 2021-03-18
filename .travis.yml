@@ -3,6 +3,10 @@ compiler: gcc
 
 dist: focal
 addons:
+  sonarcloud:
+    organization: "ilyajob05"
+    token:
+      secure: "gyuTFZNh0cAlrcrwlqfrHinNe6vYIDiKSRgvvqTrMY5Z4UNMvAe7miQjaRYe22FUvGpbV40J735GUFG55Sh6PKqDapDBFEzEwfqv8CxCdAJH2uL8KioHQ0vIFlaY8i7lIp7DTJAu4jCXxLR1Rj8i3w0spZiiduURo9oBVA0yzpaOuyBu0/t66H0o8hFwquz7sISYZSfr+5iq6/bHcZVJBxS/5f1nz+dHYG8Erus9NVb/maXtIempvMjsMAwfjMxgYqzFA6gpxi1Eh5pnvEFcHV8/TE4zCn0lmcH8QThkjSKHVTRfLu6/NAX0USbDwISDaTgjpPrsuYIOy46Q1q1TGbvFfL78UnmXk2QLzAhLD9IsFtIFu/UKqjMbMUqEmPEk+AMqK8LJF4On88sinZaPbkRJKva4LbRLhTTa07a9DIsWyacZswPCJIYfofpXdHpvO1d1qN6/DQMyxkodf3IHhO5DHqQeYXISmMQiZn8k+TEkWbcsCJfgsdDxzVvXoTrKnwOku+hmPre21akTEC5S2umlOGJaCOyPAQscsjXBuoJfK6qIj67WFeJ8Ysln0kLBflDWHtGBiFC4yw0BDbBw1gzXifN0KGAmy9esahZBpYCnWyl0UdWF5S+q5LN9xYgb/Df/L5kuhznAuVQJW/4NCR6UKVFDFmIJPVhWiY2uCbk="
   apt:
     sources:
       - ubuntu-toolchain-r-test
@@ -34,6 +38,7 @@ install:
 # before_script:
 
 script:
+    - build-wrapper-linux-x86-64 --out-dir bw-output
     - export CC=gcc-7
     - export CXX=g++-7
     - cmake --version
@@ -42,6 +47,7 @@ script:
     - cmake -DBUILD_TESTS=ON ..
     - make
     - make test
+    - sonar-scanner -Dsonar.cfamily.build-wrapper-output=bw-output
 
 after_success:
     - bash <(curl -s https://codecov.io/bash)
