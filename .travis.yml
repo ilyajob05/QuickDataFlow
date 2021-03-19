@@ -38,16 +38,16 @@ install:
 # before_script:
 
 script:
-    - build-wrapper-linux-x86-64 --out-dir bw-output && \
-    export CC=gcc-7 && \
-    export CXX=g++-7 && \
-    cmake --version && \
-    mkdir build && \
-    cd build && \
-    cmake -DBUILD_TESTS=ON .. && \
-    make && \
-    make test && \
+    - export CC=gcc-7
+    - export CXX=g++-7
+    - cmake --version
+    - mkdir build
+    - cd build
+    - cmake -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=DEBUG ..
+    - cd ..
+    - build-wrapper-linux-x86-64 --out-dir bw-output cmake --build build/ --target all
     - sonar-scanner -Dsonar.cfamily.build-wrapper-output=bw-output
+    - make test
 
 after_success:
     - bash <(curl -s https://codecov.io/bash)

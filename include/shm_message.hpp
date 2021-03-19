@@ -31,7 +31,7 @@ public:
     /// user freandly function
     inline void push_message_async() { output_message_waiter.unlock(); }
     /// user freandly function
-    inline bool push_message_async_is_complete() { output_message_complete.load(); }
+    inline bool push_message_async_is_complete() { return output_message_complete.load(); }
 
     /// user freandly function
     inline void push_message_sync()
@@ -45,7 +45,7 @@ public:
     /// user freandly function
     inline void get_message_async() { input_message_waiter.unlock(); }
     /// user freandly function
-    inline bool get_message_async_is_complete() { input_message_complete.load(); }
+    inline bool get_message_async_is_complete() { return input_message_complete.load(); }
 
     /// user freandly function
     inline void get_message_sync()
