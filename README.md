@@ -5,7 +5,7 @@
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ilyajob05_QickDataFlow&metric=alert_status)](https://sonarcloud.io/dashboard?id=ilyajob05_QickDataFlow)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ilyajob05/QickDataFlow/main/LICENSE)
 
-This library is for building multithreaded and fast C ++ applications
+This library is for building multithreaded and fast C++ applications
 
 ## Requirements
 gtest
