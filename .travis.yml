@@ -6,7 +6,7 @@ addons:
   sonarcloud:
     organization: "ilyajob05"
     token:
-      secure: "gyuTFZNh0cAlrcrwlqfrHinNe6vYIDiKSRgvvqTrMY5Z4UNMvAe7miQjaRYe22FUvGpbV40J735GUFG55Sh6PKqDapDBFEzEwfqv8CxCdAJH2uL8KioHQ0vIFlaY8i7lIp7DTJAu4jCXxLR1Rj8i3w0spZiiduURo9oBVA0yzpaOuyBu0/t66H0o8hFwquz7sISYZSfr+5iq6/bHcZVJBxS/5f1nz+dHYG8Erus9NVb/maXtIempvMjsMAwfjMxgYqzFA6gpxi1Eh5pnvEFcHV8/TE4zCn0lmcH8QThkjSKHVTRfLu6/NAX0USbDwISDaTgjpPrsuYIOy46Q1q1TGbvFfL78UnmXk2QLzAhLD9IsFtIFu/UKqjMbMUqEmPEk+AMqK8LJF4On88sinZaPbkRJKva4LbRLhTTa07a9DIsWyacZswPCJIYfofpXdHpvO1d1qN6/DQMyxkodf3IHhO5DHqQeYXISmMQiZn8k+TEkWbcsCJfgsdDxzVvXoTrKnwOku+hmPre21akTEC5S2umlOGJaCOyPAQscsjXBuoJfK6qIj67WFeJ8Ysln0kLBflDWHtGBiFC4yw0BDbBw1gzXifN0KGAmy9esahZBpYCnWyl0UdWF5S+q5LN9xYgb/Df/L5kuhznAuVQJW/4NCR6UKVFDFmIJPVhWiY2uCbk="
+      secure: "nALVyOYoJpb1IwWx28OMVGv9TJblhcvX0lxe/uD64na2+mXXflnWAOCJwaObWGVSqdiOkWGcrc/cjrVeuo0EoHZ/IiM8h0wFDPf2Pq134N/BsXdlus87//u+oQulkozS4KGyZuAlFmSyQkQC5cxmRT6PK3vzoJaspIUcTeLagQbqH6sAgZTLuQ7IiGnscgErR3yOZh8Gs+PydctuyCCEY9dFq/JPTfqEjUtshdnpVF9OzJrL35a44zfGaLjSha9le8Ee63mjxIGVT/5abCLn0YMp8ROSpI3w/66X8pw4IbBJvw40/xwlefCLrvfzkVX6lyYiMYZLFSXZr8zCJYQDm7OaQ0U/PhSklDfiYnK0WrZ4E84NxpD1wDpxZrq/SWxviOGjQev2udVFj/P1/Edde3x/2zsDo0XBKr7WeL+LThvxxlYWWpC1wLHijtp/yXTJpGqNXPM6U7LWlttTJChNkKZiAou733p4+3f17Boqfbb12CDj/I2F7aDhdmq/2evp9wYdhPVZBWx3mXWGdyuasyskGM6u0T2A1Sg7MDAygaNdI/wK0QDej6mLXWc3d9zUkSvM9oTISLZQsu/Llx9WvmkZd0CpBTxYDXkYBHuraUfmDZL99I19i27ht5TIKOTGKsc76clYiwh5PYXlJDGTrLjKnmJGVlqFmU94WHB3SM0="
   apt:
     sources:
       - ubuntu-toolchain-r-test
@@ -47,6 +47,7 @@ script:
     - cd ..
     - build-wrapper-linux-x86-64 --out-dir bw-output cmake --build build/ --target all
     - sonar-scanner -Dsonar.cfamily.build-wrapper-output=bw-output
+    - cd build
     - make test
 
 after_success:
