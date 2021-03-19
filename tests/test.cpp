@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 
 #include "shm_message.hpp"
-#include "test.h"
+#include "test.hpp"
 
 
 void idle(std::atomic_bool *event_exit)
