@@ -7,7 +7,7 @@
 #include <string>
 #include <iostream>
 #include <cstring>
-
+#include <array>
 #include "shm_message.hpp"
 
 
@@ -23,17 +23,17 @@ void idle(std::atomic_bool *event_exit)
 int main(int argc, char* argv[]) {
     using namespace fshm;
     using namespace std;
-    char element1[1000];
-    char element2[1000];
-    memset(element1, 7, 1000);
-    memset(element2, 8, 1000);
+    std::array<unsigned char, 1000> element1;
+    std::array<unsigned char, 1000> element2;
+    memset(element1.data(), 7, 1000);
+    memset(element2.data(), 8, 1000);
 
     // shmin - name of shared memory
     // element1 memory source
     // element2 memory destination
     // 100 queue elements num of input
     // 100 queue elements num of output
-    MessageBuff msg_buff("shmin", "shmin", element1, element2, 100, 100, sizeof(element1), sizeof(element2));
+    MessageBuff msg_buff("shmin", "shmin", static_cast<unsigned char*> (element1.data()), static_cast<unsigned char*> (element2.data()), 100, 100, sizeof(element1), sizeof(element2));
     // unlock thread for write to output
     msg_buff.output_message_waiter.unlock();
     // check complete
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
     cout << msg_buff.input_message_complete.load() << endl;
     cout << endl;
 
-    if(0 != std::memcmp(element1, element2, sizeof(element1))){
+    if(0 != std::memcmp(static_cast<unsigned char*> (element1.data()), element2.data(), sizeof(element1))){
         cout << "error" << endl;
         return -1;
     }

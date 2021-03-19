@@ -58,16 +58,16 @@ public:
 
     virtual ~MessageBuff();
     MessageBuff(const char *shm_src_name, const char *shm_dst_name,
-                void *mem_src_element, void *mem_dst_element,
+                unsigned char *mem_src_element, unsigned char *mem_dst_element,
                 const size_t q_size_in_, const size_t q_size_out_,
                 const size_t element_size_in_, const size_t element_size_out_);
 
 private:
     size_t len; /// size message
-    void *buffPtr = nullptr; /// pointer on buff
+    unsigned char *buffPtr = nullptr; /// pointer on buff
 
-    void *mem_src_element = nullptr; ///pointer for external src element
-    void *mem_dst_element = nullptr; ///pointer for external dst element
+    unsigned char *mem_src_element = nullptr; ///pointer for external src element
+    unsigned char *mem_dst_element = nullptr; ///pointer for external dst element
     const char *shm_in_name; /// name of shared memory input
     const char *shm_out_name; /// name of shared memory output
     const size_t q_size_in; /// num elements for input
@@ -84,7 +84,7 @@ private:
     };
 
     /// atributes for shm shared memory
-    typedef struct _shmemq {
+    struct shmemq_t {
         unsigned long max_count;
         unsigned int element_size;
         unsigned long max_size;
@@ -92,18 +92,11 @@ private:
         int shmem_fd;
         unsigned long mmap_size;
         struct shmemq_info* mem;
-    } shmemq_t;
-
-/// todo:
-//    struct cb_storage_t {
-//        std::function<void(uint32_t)> cb;
-//        uint32_t handle;
-//    };
+    };
 
     std::atomic_bool thr_in_event_exit{false}; /// signal for exit
     std::atomic_bool thr_out_event_exit{false}; /// signal for exit
     std::atomic_bool thr_idle_event_exit{false}; /// signal for exit
-
 
 //    std::unique_ptr<std::thread> th_reader_input{nullptr};
 //    std::unique_ptr<std::thread> th_writer_out{nullptr};
@@ -127,16 +120,16 @@ private:
     /// \param self shared memory descriptor
     /// \param src data source
     /// \param len is element size of buffer for write to memory
-    bool shmemq_try_enqueue(shmemq_t* self, void* src, unsigned int len);
+    bool shmemq_try_enqueue(shmemq_t* self, unsigned char* src, unsigned int len);
     /// copy shared memory to dst
     /// \param self shared memory descriptor
     /// \param dst data destination
     /// \param len is element size of buffer for write to memory
-    bool shmemq_try_dequeue(shmemq_t* self, void* dst, unsigned int len);
+    bool shmemq_try_dequeue(shmemq_t* self, unsigned char* dst, unsigned int len);
     /// thread for write to out buffer
-    static void write_to_out(MessageBuff *self, void *mem_src_element);
+    static void write_to_out(MessageBuff *self, unsigned char *mem_src_element);
     /// thread for read from input buffer
-    static void read_from_input(MessageBuff *self, void *mem_dst_element);
+    static void read_from_input(MessageBuff *self, unsigned char *mem_dst_element);
     /// clear shared memory
     void clear_shmem_attr(shmemq_t *shmem);
     /// destroy shared memory

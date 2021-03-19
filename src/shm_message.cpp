@@ -47,7 +47,7 @@ MessageBuff::~MessageBuff()
 }
 
 MessageBuff::MessageBuff(const char *shm_src_name, const char *shm_dst_name,
-                         void *mem_src_element_, void *mem_dst_element_,
+                         unsigned char *mem_src_element_, unsigned char *mem_dst_element_,
                          const size_t q_size_in_, const size_t q_size_out_,
                          const size_t element_size_in_, const size_t element_size_out_) :
     input_message_complete(false), output_message_complete(false),
@@ -68,7 +68,7 @@ MessageBuff::MessageBuff(const char *shm_src_name, const char *shm_dst_name,
     th_writer_out = thread(write_to_out, this, mem_src_element);
 }
 
-void MessageBuff::read_from_input(MessageBuff *self, void *mem_dst_element)
+void MessageBuff::read_from_input(MessageBuff *self, unsigned char *mem_dst_element)
 {
     // main cycle of thread
     while(!self->thr_in_event_exit.load())
@@ -82,7 +82,7 @@ void MessageBuff::read_from_input(MessageBuff *self, void *mem_dst_element)
     }
 }
 
-void MessageBuff::write_to_out(MessageBuff *self, void *mem_src_element)
+void MessageBuff::write_to_out(MessageBuff *self, unsigned char *mem_src_element)
 {
     // main cycle of thread
     while(!self->thr_out_event_exit.load())
@@ -159,7 +159,7 @@ MessageBuff::shmemq_t* MessageBuff::shmemq_new(char const* name, size_t q_size, 
     return self;
 }
 
-bool MessageBuff::shmemq_try_enqueue(shmemq_t* self, void* src, unsigned int len) {
+bool MessageBuff::shmemq_try_enqueue(shmemq_t* self, unsigned char* src, unsigned int len) {
     if (len != self->element_size)
         return false;
 
@@ -178,7 +178,7 @@ bool MessageBuff::shmemq_try_enqueue(shmemq_t* self, void* src, unsigned int len
     return true;
 }
 
-bool MessageBuff::shmemq_try_dequeue(shmemq_t* self, void* dst, unsigned int len) {
+bool MessageBuff::shmemq_try_dequeue(shmemq_t* self, unsigned char* dst, unsigned int len) {
     if (len != self->element_size)
         return false;
 
