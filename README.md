@@ -13,6 +13,7 @@ gtest
 ## Usage
 ```
 git clone https://github.com/ilyajob05/QickDataFlow.git
+cd QickDataFlow
 chmod +x build.sh
 ./build.sh
 ```
