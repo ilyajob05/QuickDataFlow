@@ -38,15 +38,15 @@ install:
 # before_script:
 
 script:
-    - build-wrapper-linux-x86-64 --out-dir bw-output
-    - export CC=gcc-7
-    - export CXX=g++-7
-    - cmake --version
-    - mkdir build
-    - cd build
-    - cmake -DBUILD_TESTS=ON ..
-    - make
-    - make test
+    - build-wrapper-linux-x86-64 --out-dir bw-output && \
+    export CC=gcc-7 && \
+    export CXX=g++-7 && \
+    cmake --version && \
+    mkdir build && \
+    cd build && \
+    cmake -DBUILD_TESTS=ON .. && \
+    make && \
+    make test && \
     - sonar-scanner -Dsonar.cfamily.build-wrapper-output=bw-output
 
 after_success:
