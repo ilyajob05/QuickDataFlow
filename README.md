@@ -13,11 +13,8 @@ gtest
 ## Usage
 ```
 git clone https://github.com/ilyajob05/QickDataFlow.git
-mkdir build
-cd build
-cmake ..
-make
-make test
+chmod +x build.sh
+./build.sh
 ```
 
 
