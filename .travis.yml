@@ -45,9 +45,10 @@ script:
     - cmake -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=DEBUG ..
     - cd ..
     - build-wrapper-linux-x86-64 --out-dir bw-output cmake --build build/ --target all
+    - bash <(curl -s https://codecov.io/bash)
     - sonar-scanner -Dsonar.cfamily.build-wrapper-output=bw-output
     - cd build
     - make test
 
-after_success:
-    - bash <(curl -s https://codecov.io/bash)
+#after_success:
+#    - bash <(curl -s https://codecov.io/bash)
