@@ -12,6 +12,8 @@ addons:
     packages:
       - g++-7
       - valgrind
+      - gcovr
+      - python3-pip
 
 before_install:
     # Combine global build options with OS/compiler-dependent options
@@ -22,6 +24,7 @@ install:
     - ${CXX} --version
     - ${CXX} -v
 #    - sudo pip install codecov
+    - pip3 install --user gcovr
     - sudo apt-get install libgtest-dev
     - cmake -DCMAKE_BUILD_TYPE=Release /usr/src/gtest
     - cmake --build .
@@ -43,12 +46,10 @@ script:
     - mkdir build
     - cd build
     - cmake -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=DEBUG ..
-    - cd ..
-    - build-wrapper-linux-x86-64 --out-dir bw-output cmake --build build/ --target all
-    - bash <(curl -s https://codecov.io/bash)
+    - build-wrapper-linux-x86-64 --out-dir bw-output cmake --build . --clean-first --target all
+    - make coverage
+    - ctest -C Debug
     - sonar-scanner -Dsonar.cfamily.build-wrapper-output=bw-output
-    - cd build
-    - make test
 
 #after_success:
-#    - bash <(curl -s https://codecov.io/bash)
+    - bash <(curl -s https://codecov.io/bash)
