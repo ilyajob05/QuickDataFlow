@@ -46,8 +46,11 @@ script:
     - mkdir build
     - cd build
     - cmake -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=DEBUG ..
-    - build-wrapper-linux-x86-64 --out-dir bw-output cmake --build . --clean-first --target all
+    - cd ..
+    - build-wrapper-linux-x86-64 --out-dir bw-output cmake --build build/ --clean-first --target all
+    - cd build
     - ctest -C Debug
+    - cd ..
     - sonar-scanner -Dsonar.cfamily.build-wrapper-output=bw-output
 
 #after_success:
