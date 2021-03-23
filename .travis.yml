@@ -51,6 +51,7 @@ script:
     - cd build
     - ctest -C Debug
     - cd ..
+    - pwd
     - gcovr --sonarqube coverage.xml
     - cat coverage.xml
     - sonar-scanner -Dsonar.cfamily.build-wrapper-output=bw-output
