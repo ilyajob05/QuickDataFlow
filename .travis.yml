@@ -1,19 +1,27 @@
+dist: focal
 language: cpp
 compiler: gcc
 
-dist: focal
+cache:
+  directories:
+  - '$HOME/.sonar/cache'
+
 addons:
   sonarcloud:
     organization: "ilyajob05"
     token: "2f8f2781646a1193aee16d9237757956c46bb0f7"
   apt:
-    sources:
-      - ubuntu-toolchain-r-test
+#    sources:
+#      - ubuntu-toolchain-r-test
     packages:
-      - g++-7
+#      - g++-7
+      - cmake
       - valgrind
       - gcovr
       - python3-pip
+
+env:
+  - SONAR=true
 
 before_install:
     # Combine global build options with OS/compiler-dependent options
