@@ -1,4 +1,4 @@
-# QickDataFlow
+# QuickDataFlow
 
 [![Travis Build Status](https://travis-ci.com/ilyajob05/QickDataFlow.svg?branch=main)](https://travis-ci.com/ilyajob05/QickDataFlow)
 [![codecov](https://codecov.io/gh/ilyajob05/QickDataFlow/branch/main/graph/badge.svg?token=T2M14V6SK8)](https://codecov.io/gh/ilyajob05/QickDataFlow)
