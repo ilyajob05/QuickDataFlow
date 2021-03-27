@@ -14,7 +14,6 @@ addons:
 #    sources:
 #      - ubuntu-toolchain-r-test
     packages:
-#      - g++-7
       - cmake
       - valgrind
       - gcovr
@@ -31,7 +30,6 @@ install:
     - echo ${CXX}
     - ${CXX} --version
     - ${CXX} -v
-#    - sudo pip install codecov
     - pip3 install --user gcovr
     - sudo apt-get install libgtest-dev
     - cmake -DCMAKE_BUILD_TYPE=Release /usr/src/gtest
@@ -48,8 +46,6 @@ install:
 # before_script:
 
 script:
-#    - export CC=gcc-7
-#    - export CXX=g++-7
     - cmake --version
     - mkdir build
     - cd build
