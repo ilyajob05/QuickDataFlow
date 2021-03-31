@@ -100,7 +100,7 @@ void MessageBuff::clear_shmem_attr(shmemq_t *shmem)
         close(shmem->shmem_fd);
         shm_unlink(shmem->name);
     }
-    delete shmem->name;
+    free(shmem->name);
     delete shmem;
 }
 
@@ -202,7 +202,7 @@ void MessageBuff::shmemq_destroy(shmemq_t* self, int unlink) {
     if (unlink) {
         shm_unlink(self->name);
     }
-    delete self->name;
+    free(self->name);
     delete self;
 }
 }
