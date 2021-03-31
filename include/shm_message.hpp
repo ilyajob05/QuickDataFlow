@@ -86,12 +86,12 @@ private:
     /// atributes for shm shared memory
     struct shmemq_t {
         unsigned long max_count;
-        unsigned int element_size;
         unsigned long max_size;
-        char* name;
-        int shmem_fd;
         unsigned long mmap_size;
+        unsigned int element_size;
+        int shmem_fd;
         struct shmemq_info* mem;
+        char* name;
     };
 
     std::atomic_bool thr_in_event_exit{false}; /// signal for exit
