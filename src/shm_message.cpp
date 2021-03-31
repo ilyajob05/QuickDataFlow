@@ -25,12 +25,13 @@ MessageBuff::~MessageBuff()
     thr_out_event_exit.store(true);
     thr_idle_event_exit.store(true);
 
-
     queue_input->mem->read_index = 0;
     queue_output->mem->read_index = 0;
 
-    output_message_waiter.unlock();
-    input_message_waiter.unlock();
+    input_message_cv.notify_one();
+    input_message_ready = true;
+    output_message_cv.notify_one();
+    output_message_ready = true;
 //    read_from_input(this, mem_dst_element);
 //    write_to_out(this, mem_src_element);
 
@@ -47,50 +48,48 @@ MessageBuff::~MessageBuff()
 }
 
 MessageBuff::MessageBuff(const char *shm_src_name, const char *shm_dst_name,
-                         unsigned char *mem_src_element_, unsigned char *mem_dst_element_,
                          const size_t q_size_in_, const size_t q_size_out_,
                          const size_t element_size_in_, const size_t element_size_out_) :
     input_message_complete(false), output_message_complete(false),
-    mem_src_element{mem_src_element_}, mem_dst_element{mem_dst_element_},
     shm_in_name{shm_src_name}, shm_out_name{shm_dst_name},
     q_size_in{q_size_in_}, q_size_out{q_size_out_},
     element_size_in{element_size_in_}, element_size_out{element_size_out_}
 {
     //    buffPtr = memalign(alignof(int), len);
 
-    input_message_waiter.lock();
-    output_message_waiter.lock();
-
     queue_input = shmemq_new(shm_in_name, q_size_in, element_size_in);
     queue_output = shmemq_new(shm_out_name, q_size_out, element_size_out);
 
-    th_reader_input = thread(read_from_input, this, mem_dst_element);
-    th_writer_out = thread(write_to_out, this, mem_src_element);
+    th_reader_input = thread(read_from_input, this);
+    th_writer_out = thread(write_to_out, this);
 }
 
-void MessageBuff::read_from_input(MessageBuff *self, unsigned char *mem_dst_element)
+void MessageBuff::read_from_input(MessageBuff *self)
 {
     // main cycle of thread
     while(!self->thr_in_event_exit.load())
     {
+        std::unique_lock<std::mutex> lck(self->input_message_waiter);
+        self->input_message_cv.wait(lck, [&]() { return self->input_message_ready; });
+        self->input_message_ready = false;
         // unlock input_message_waiter from external process for next step
-        self->input_message_waiter.lock();
         self->input_message_complete.store(false);
-        // for exit from task
-        self->shmemq_try_dequeue(self->queue_input, mem_dst_element, self->element_size_in);
+        self->shmemq_try_dequeue(self->queue_input, self->mem_dst_element.load(), self->element_size_in);
         self->input_message_complete.store(true);
     }
 }
 
-void MessageBuff::write_to_out(MessageBuff *self, unsigned char *mem_src_element)
+void MessageBuff::write_to_out(MessageBuff *self)
 {
     // main cycle of thread
     while(!self->thr_out_event_exit.load())
     {
+        std::unique_lock<std::mutex> lck(self->output_message_waiter);
+        self->output_message_cv.wait(lck, [&]() { return self->output_message_ready; });
+        self->output_message_ready = false;
         // unlock output_message_waiter from external process for next step
-        self->output_message_waiter.lock();
         self->output_message_complete.store(false);
-        self->shmemq_try_enqueue(self->queue_input, mem_src_element, self->element_size_in);
+        self->shmemq_try_enqueue(self->queue_output, self->mem_src_element.load(), self->element_size_in);
         self->output_message_complete.store(true);
     }
 }

@@ -9,6 +9,8 @@
 #include <shared_mutex>
 #include <memory>
 #include <functional>
+#include <array>
+#include <condition_variable>
 
 namespace fshm {
 
@@ -17,6 +19,10 @@ class MessageBuff
 public:
     std::mutex input_message_waiter;
     std::mutex output_message_waiter;
+    std::condition_variable input_message_cv;
+    std::condition_variable output_message_cv;
+    bool input_message_ready{false};
+    bool output_message_ready{false};
 
     std::atomic_bool input_message_complete; /// for async read data
     std::atomic_bool output_message_complete; /// for async write data
@@ -29,45 +35,61 @@ public:
     const char *shm_out_name_get() const { return shm_out_name; }
 
     /// user freandly function
-    inline void push_message_async() { output_message_waiter.unlock(); }
+    inline void push_message_async(unsigned char *src_buff)
+    {
+        {
+            std::lock_guard<std::mutex> lck(output_message_waiter);
+            mem_src_element = src_buff;
+            output_message_ready = true;
+        }
+        output_message_cv.notify_one();
+    }
     /// user freandly function
     inline bool push_message_async_is_complete() { return output_message_complete.load(); }
 
     /// user freandly function
-    inline void push_message_sync()
+    inline void push_message_sync(unsigned char *src_buff)
     {
-        output_message_waiter.unlock();
-        while (!output_message_complete.load()) {
+        push_message_async(src_buff);
+        while (!push_message_async_is_complete()) {
             ;
         }
     }
 
     /// user freandly function
-    inline void get_message_async() { input_message_waiter.unlock(); }
+    inline void get_message_async(unsigned char *dst_buff)
+    {
+        {
+            std::lock_guard<std::mutex> lck(input_message_waiter);
+            mem_dst_element = dst_buff;
+            input_message_ready = true;
+        }
+        input_message_cv.notify_one();
+    }
     /// user freandly function
     inline bool get_message_async_is_complete() { return input_message_complete.load(); }
 
     /// user freandly function
-    inline void get_message_sync()
+    inline void get_message_sync(unsigned char *dst_buff)
     {
-        input_message_waiter.unlock();
-        while (!input_message_complete.load()) {
+        get_message_async(dst_buff);
+        while (!get_message_async_is_complete()) {
             ;
         }
     }
 
     virtual ~MessageBuff();
     MessageBuff(const char *shm_src_name, const char *shm_dst_name,
-                unsigned char *mem_src_element, unsigned char *mem_dst_element,
                 const size_t q_size_in_, const size_t q_size_out_,
                 const size_t element_size_in_, const size_t element_size_out_);
+
 
 private:
     size_t len; /// size message
     unsigned char *buffPtr = nullptr; /// pointer on buff
 
-    unsigned char *mem_src_element = nullptr; ///pointer for external src element
-    unsigned char *mem_dst_element = nullptr; ///pointer for external dst element
+    std::atomic<unsigned char*> mem_src_element = {nullptr}; ///pointer for external src element
+    std::atomic<unsigned char*> mem_dst_element = {nullptr}; ///pointer for external dst element
     const char *shm_in_name; /// name of shared memory input
     const char *shm_out_name; /// name of shared memory output
     const size_t q_size_in; /// num elements for input
@@ -127,9 +149,9 @@ private:
     /// \param len is element size of buffer for write to memory
     bool shmemq_try_dequeue(shmemq_t* self, unsigned char* dst, unsigned int len);
     /// thread for write to out buffer
-    static void write_to_out(MessageBuff *self, unsigned char *mem_src_element);
+    static void write_to_out(MessageBuff *self);
     /// thread for read from input buffer
-    static void read_from_input(MessageBuff *self, unsigned char *mem_dst_element);
+    static void read_from_input(MessageBuff *self);
     /// clear shared memory
     void clear_shmem_attr(shmemq_t *shmem);
     /// destroy shared memory

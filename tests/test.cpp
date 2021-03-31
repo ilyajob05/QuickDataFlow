@@ -30,12 +30,12 @@ TEST(MessageBuff, output_message_waiter)
     memset(element1.data(), 7, 1000);
     memset(element2.data(), 8, 1000);
 
-    MessageBuff msg_buff("shmin", "shmin", static_cast<unsigned char*> (element1.data()), static_cast<unsigned char*> (element2.data()), 100, 100, sizeof(element1), sizeof(element2));
+    MessageBuff msg_buff("shmin", "shmin", 100, 100, sizeof(element1), sizeof(element2));
     // unlock thread for output
-    msg_buff.output_message_waiter.unlock();
-    while(!msg_buff.output_message_complete.load());
-    msg_buff.input_message_waiter.unlock();
-    while(!msg_buff.input_message_complete.load());
+    msg_buff.push_message_async(static_cast<unsigned char*> (element1.data()));
+    while(!msg_buff.push_message_async_is_complete());
+    msg_buff.get_message_async(static_cast<unsigned char*> (element2.data()));
+    while(!msg_buff.get_message_async_is_complete());
 
     ASSERT_TRUE(0 == std::memcmp(element1.data(), element2.data(), sizeof(element1)));
 }
@@ -49,10 +49,10 @@ TEST(MessageBuff, push_message_sync)
     memset(element1.data(), 7, 1000);
     memset(element2.data(), 8, 1000);
 
-    MessageBuff msg_buff("shmin", "shmin", static_cast<unsigned char*> (element1.data()), static_cast<unsigned char*> (element2.data()), 100, 100, element1.size(), element2.size());
+    MessageBuff msg_buff("shmin", "shmin", 100, 100, element1.size(), element2.size());
     // unlock thread for output
-    msg_buff.push_message_sync();
-    msg_buff.get_message_sync();
+    msg_buff.push_message_sync(static_cast<unsigned char*> (element1.data()));
+    msg_buff.get_message_sync(static_cast<unsigned char*> (element2.data()));
 
     ASSERT_TRUE(0 == std::memcmp(static_cast<unsigned char*> (element1.data()), static_cast<unsigned char*> (element2.data()), element1.size()));
 }

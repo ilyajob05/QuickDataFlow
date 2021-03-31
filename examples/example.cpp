@@ -33,20 +33,11 @@ int main(int argc, char* argv[]) {
     // element2 memory destination
     // 100 queue elements num of input
     // 100 queue elements num of output
-    MessageBuff msg_buff("shmin", "shmin", static_cast<unsigned char*> (element1.data()), static_cast<unsigned char*> (element2.data()), 100, 100, sizeof(element1), sizeof(element2));
+    MessageBuff msg_buff("shmin", "shmin", 100, 100, sizeof(element1), sizeof(element2));
     // unlock thread for write to output
-    msg_buff.output_message_waiter.unlock();
+    msg_buff.push_message_sync(static_cast<unsigned char*> (element1.data()));
     // check complete
-    cout << msg_buff.output_message_complete.load() << endl;
-
-    msg_buff.push_message_sync();
-
-    cout << msg_buff.output_message_complete.load() << endl;
-
-    msg_buff.input_message_waiter.unlock();
-    cout << msg_buff.input_message_complete.load() << endl;
-
-    msg_buff.get_message_sync();
+    msg_buff.get_message_sync(static_cast<unsigned char*> (element2.data()));
 
     cout << msg_buff.input_message_complete.load() << endl;
     cout << endl;
