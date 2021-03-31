@@ -131,8 +131,8 @@ private:
 //    std::thread th_idle(idle, &thr_idle_event_exit);
 
 
-    shmemq_t *queue_input = nullptr; /// shared memory queue input
-    shmemq_t *queue_output = nullptr; /// shared memory queue output
+    std::unique_ptr<shmemq_t> queue_input = nullptr; /// shared memory queue input
+    std::unique_ptr<shmemq_t> queue_output = nullptr; /// shared memory queue output
 
     std::function<void(uint32_t)> cb; /// callback function for read input data
 
@@ -140,7 +140,7 @@ private:
     /// \param name name shared memory descriptor
     /// \param max_count max size of memory buffer
     /// \param element_size size for one element
-    shmemq_t* shmemq_new(char const* name, size_t q_size, size_t element_size);
+    std::unique_ptr<shmemq_t> shmemq_new(char const* name, size_t q_size, size_t element_size);
     /// copy data src to shred memory
     /// \param self shared memory descriptor
     /// \param src data source
