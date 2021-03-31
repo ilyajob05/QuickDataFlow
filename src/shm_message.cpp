@@ -70,7 +70,7 @@ void MessageBuff::read_from_input(MessageBuff *self)
     while(!self->thr_in_event_exit.load())
     {
         std::unique_lock<std::mutex> lck(self->input_message_waiter);
-        self->input_message_cv.wait(lck, [&]() { return self->input_message_ready; });
+        self->input_message_cv.wait(lck, [&self]() { return self->input_message_ready; });
         self->input_message_ready = false;
         // unlock input_message_waiter from external process for next step
         self->input_message_complete.store(false);
@@ -85,7 +85,7 @@ void MessageBuff::write_to_out(MessageBuff *self)
     while(!self->thr_out_event_exit.load())
     {
         std::unique_lock<std::mutex> lck(self->output_message_waiter);
-        self->output_message_cv.wait(lck, [&]() { return self->output_message_ready; });
+        self->output_message_cv.wait(lck, [&self]() { return self->output_message_ready; });
         self->output_message_ready = false;
         // unlock output_message_waiter from external process for next step
         self->output_message_complete.store(false);
@@ -100,15 +100,15 @@ void MessageBuff::clear_shmem_attr(shmemq_t *shmem)
         close(shmem->shmem_fd);
         shm_unlink(shmem->name);
     }
-    free(shmem->name);
-    free(shmem);
+    delete shmem->name;
+    delete shmem;
 }
 
 MessageBuff::shmemq_t* MessageBuff::shmemq_new(char const* name, size_t q_size, size_t element_size) {
     shmemq_t* self;
     bool created;
 
-    self = (shmemq_t*)malloc(sizeof(shmemq_t));
+    self = new shmemq_t;
     self->max_count = q_size;
     self->element_size = element_size;
     self->max_size = q_size * element_size;
@@ -122,24 +122,24 @@ MessageBuff::shmemq_t* MessageBuff::shmemq_new(char const* name, size_t q_size, 
             self->shmem_fd = shm_open(name, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
             if (self->shmem_fd == -1) {
                 clear_shmem_attr(self);
-                return NULL;
+                return nullptr;
             }
             created = true;
         } else {
             clear_shmem_attr(self);
-            return NULL;
+            return nullptr;
         }
     }
     printf("initialized queue %s, created = %d\n", name, created);
     if (created && (-1 == ftruncate(self->shmem_fd, self->mmap_size))){
         clear_shmem_attr(self);
-        return NULL;
+        return nullptr;
     }
 
-    self->mem = (struct shmemq_info*)mmap(NULL, self->mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, self->shmem_fd, 0);
+    self->mem = (struct shmemq_info*)mmap(nullptr, self->mmap_size, PROT_READ | PROT_WRITE, MAP_SHARED, self->shmem_fd, 0);
     if (self->mem == MAP_FAILED){
         clear_shmem_attr(self);
-        return NULL;
+        return nullptr;
     }
     if (created) {
         self->mem->read_index = self->mem->write_index = 0;
@@ -202,7 +202,7 @@ void MessageBuff::shmemq_destroy(shmemq_t* self, int unlink) {
     if (unlink) {
         shm_unlink(self->name);
     }
-    free(self->name);
-    free(self);
+    delete self->name;
+    delete self;
 }
 }

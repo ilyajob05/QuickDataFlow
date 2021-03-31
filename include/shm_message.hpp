@@ -79,6 +79,9 @@ public:
     }
 
     virtual ~MessageBuff();
+    MessageBuff(MessageBuff const &) = delete;
+    MessageBuff &operator=(MessageBuff const &) = delete;
+
     MessageBuff(const char *shm_src_name, const char *shm_dst_name,
                 const size_t q_size_in_, const size_t q_size_out_,
                 const size_t element_size_in_, const size_t element_size_out_);
