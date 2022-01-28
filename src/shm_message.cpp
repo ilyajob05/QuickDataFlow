@@ -21,12 +21,10 @@ namespace fshm {
 
 MessageBuff::~MessageBuff()
 {
+    // todo
     thr_in_event_exit.store(true);
     thr_out_event_exit.store(true);
     thr_idle_event_exit.store(true);
-
-    queue_input->mem->read_index = 0;
-    queue_output->mem->read_index = 0;
 
     input_message_cv.notify_one();
     input_message_ready = true;
@@ -44,6 +42,9 @@ MessageBuff::~MessageBuff()
 
     shmemq_destroy(queue_input.get(), 1);
     shmemq_destroy(queue_output.get(), 1);
+
+    queue_input->mem->read_index = 0;
+    queue_output->mem->read_index = 0;
 //    free(buffPtr);
 }
 
@@ -74,7 +75,7 @@ void MessageBuff::read_from_input(MessageBuff *self)
         self->input_message_ready = false;
         // unlock input_message_waiter from external process for next step
         self->input_message_complete.store(false);
-        self->shmemq_try_dequeue(self->queue_input.get(), self->mem_dst_element.load(), self->element_size_in);
+        self->shmemq_try_dequeue(self->queue_input.get(), self->mem_src_element.load(), self->element_size_in);
         self->input_message_complete.store(true);
     }
 }
@@ -89,7 +90,7 @@ void MessageBuff::write_to_out(MessageBuff *self)
         self->output_message_ready = false;
         // unlock output_message_waiter from external process for next step
         self->output_message_complete.store(false);
-        self->shmemq_try_enqueue(self->queue_output.get(), self->mem_src_element.load(), self->element_size_in);
+        self->shmemq_try_enqueue(self->queue_output.get(), self->mem_dst_element.load(), self->element_size_out);
         self->output_message_complete.store(true);
     }
 }
@@ -157,7 +158,7 @@ std::unique_ptr<MessageBuff::shmemq_t> MessageBuff::shmemq_new(char const* name,
     return self;
 }
 
-bool MessageBuff::shmemq_try_enqueue(shmemq_t* self, unsigned char* src, unsigned int len) {
+bool MessageBuff::shmemq_try_enqueue(shmemq_t* self, unsigned char* dst, unsigned int len) {
     if (len != self->element_size)
         return false;
 
@@ -169,14 +170,14 @@ bool MessageBuff::shmemq_try_enqueue(shmemq_t* self, unsigned char* src, unsigne
         return false; // There is no more room in the queue
     }
 
-    memcpy(&self->mem->data[self->mem->write_index % self->max_size], src, len);
+    memcpy(&self->mem->data[self->mem->write_index % self->max_size], dst, len);
     self->mem->write_index += self->element_size;
 
     pthread_mutex_unlock(&self->mem->lock);
     return true;
 }
 
-bool MessageBuff::shmemq_try_dequeue(shmemq_t* self, unsigned char* dst, unsigned int len) {
+bool MessageBuff::shmemq_try_dequeue(shmemq_t* self, unsigned char* src, unsigned int len) {
     if (len != self->element_size)
         return false;
 
@@ -188,7 +189,7 @@ bool MessageBuff::shmemq_try_dequeue(shmemq_t* self, unsigned char* dst, unsigne
         return false; // There are no elements that haven't been consumed yet
     }
 
-    memcpy(dst, &self->mem->data[self->mem->read_index % self->max_size], len);
+    memcpy(src, &self->mem->data[self->mem->read_index % self->max_size], len);
     self->mem->read_index += self->element_size;
 
     pthread_mutex_unlock(&self->mem->lock);

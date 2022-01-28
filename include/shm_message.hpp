@@ -39,7 +39,7 @@ public:
     {
         {
             std::lock_guard<std::mutex> lck(output_message_waiter);
-            mem_src_element = src_buff;
+            mem_dst_element = src_buff;
             output_message_ready = true;
         }
         output_message_cv.notify_one();
@@ -61,7 +61,7 @@ public:
     {
         {
             std::lock_guard<std::mutex> lck(input_message_waiter);
-            mem_dst_element = dst_buff;
+            mem_src_element = dst_buff;
             input_message_ready = true;
         }
         input_message_cv.notify_one();
@@ -145,12 +145,12 @@ private:
     /// \param self shared memory descriptor
     /// \param src data source
     /// \param len is element size of buffer for write to memory
-    bool shmemq_try_enqueue(shmemq_t* self, unsigned char* src, unsigned int len);
+    bool shmemq_try_enqueue(shmemq_t* self, unsigned char* dst, unsigned int len);
     /// copy shared memory to dst
     /// \param self shared memory descriptor
     /// \param dst data destination
-    /// \param len is element size of buffer for write to memory
-    bool shmemq_try_dequeue(shmemq_t* self, unsigned char* dst, unsigned int len);
+    /// \param len is element size of buffer for read from memory
+    bool shmemq_try_dequeue(shmemq_t* self, unsigned char* src, unsigned int len);
     /// thread for write to out buffer
     static void write_to_out(MessageBuff *self);
     /// thread for read from input buffer

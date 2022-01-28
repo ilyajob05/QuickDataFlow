@@ -20,17 +20,29 @@ set (CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
 include_directories(include)
 file(GLOB SRC_LIST "src/*.cpp")
 
-
-################# library config #################
-
-
-################# create executable app #################
-add_executable(${CMAKE_PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/examples/example.cpp ${SRC_LIST})
-
+################# create lib #################
+add_library(${CMAKE_PROJECT_NAME} SHARED ${SRC_LIST})
 
 ################# link connect #################
 target_link_libraries(${CMAKE_PROJECT_NAME} -lrt -lpthread)
 
+################# create executable app #################
+add_executable(example ${CMAKE_CURRENT_SOURCE_DIR}/examples/example.cpp)
+target_link_libraries(example ${CMAKE_PROJECT_NAME} -lrt -lpthread)
+
+################# examples config #################
+# OpenCV
+find_package(OpenCV REQUIRED)
+if(OpenCV_FOUND)
+    include_directories(${OpenCV_INCLUDE_DIRS})
+    ################# create examples app #################
+    add_executable(img_sender ${CMAKE_CURRENT_SOURCE_DIR}/examples/img_sender.cpp)
+    add_executable(img_receiver ${CMAKE_CURRENT_SOURCE_DIR}/examples/img_receiver.cpp)
+    ################# link connect #################
+    # OpenCV
+    target_link_libraries(img_sender ${CMAKE_PROJECT_NAME} ${OpenCV_LIBS} -lrt -lpthread)
+    target_link_libraries(img_receiver ${CMAKE_PROJECT_NAME} ${OpenCV_LIBS} -lrt -lpthread)
+endif()
 
 ################# configure for test #################
 ################# Add gtest environment #################
