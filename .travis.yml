@@ -32,6 +32,7 @@ install:
     - ${CXX} -v
     - pip3 install --user gcovr
     - sudo apt-get install libgtest-dev
+    - sudo apt-get install libopencv-dev
     - cmake -DCMAKE_BUILD_TYPE=Release /usr/src/gtest
     - cmake --build .
     - sudo mv lib/lib*.a /usr/lib
