@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/mman.h>
 #include <thread>
 #include <atomic>
 #include <stdio.h>
@@ -37,6 +38,8 @@ TEST(MessageBuff, output_message_waiter)
     msg_buff.get_message_async(static_cast<unsigned char*> (element2.data()));
     while(!msg_buff.get_message_async_is_complete());
 
+    shm_unlink("shmin");
+
     ASSERT_TRUE(0 == std::memcmp(element1.data(), element2.data(), sizeof(element1)));
 }
 
@@ -53,6 +56,8 @@ TEST(MessageBuff, push_message_sync)
     // unlock thread for output
     msg_buff.push_message_sync(static_cast<unsigned char*> (element1.data()));
     msg_buff.get_message_sync(static_cast<unsigned char*> (element2.data()));
+
+    shm_unlink("shmin");
 
     ASSERT_TRUE(0 == std::memcmp(static_cast<unsigned char*> (element1.data()), static_cast<unsigned char*> (element2.data()), element1.size()));
 }
