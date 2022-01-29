@@ -22,10 +22,11 @@ namespace fshm {
 MessageBuff::~MessageBuff()
 {
     // todo
+    thr_idle_event_exit.store(true);
     thr_in_event_exit.store(true);
     thr_out_event_exit.store(true);
-    thr_idle_event_exit.store(true);
 
+    // empty cycle
     input_message_cv.notify_one();
     input_message_ready = true;
     output_message_cv.notify_one();
@@ -40,11 +41,11 @@ MessageBuff::~MessageBuff()
 //    if(th_idle.joinable())
 //        th_idle.join();
 
-    shmemq_destroy(queue_input.get(), 1);
-    shmemq_destroy(queue_output.get(), 1);
+    shmemq_destroy(queue_input.get(), 0);
+    shmemq_destroy(queue_output.get(), 0);
 
-    queue_input->mem->read_index = 0;
-    queue_output->mem->read_index = 0;
+//    queue_input->mem->read_index = 0;
+//    queue_output->mem->read_index = 0;
 //    free(buffPtr);
 }
 
@@ -72,6 +73,9 @@ void MessageBuff::read_from_input(MessageBuff *self)
     {
         std::unique_lock lck(self->input_message_waiter);
         self->input_message_cv.wait(lck, [&self]() { return self->input_message_ready; });
+        if(self->thr_in_event_exit.load()){
+            break;
+        }
         self->input_message_ready = false;
         // unlock input_message_waiter from external process for next step
         self->input_message_complete.store(false);
@@ -87,6 +91,9 @@ void MessageBuff::write_to_out(MessageBuff *self)
     {
         std::unique_lock lck(self->output_message_waiter);
         self->output_message_cv.wait(lck, [&self]() { return self->output_message_ready; });
+        if(self->thr_out_event_exit.load()){
+            break;
+        }
         self->output_message_ready = false;
         // unlock output_message_waiter from external process for next step
         self->output_message_complete.store(false);
