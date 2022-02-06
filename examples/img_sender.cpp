@@ -35,24 +35,32 @@ int main(int argc, char *argv[])
 
     Mat inputImage;
     Mat sendImage(480, 640, CV_8UC3);
-    namedWindow("camera image senser", WINDOW_NORMAL);
+    namedWindow("camera image sender", WINDOW_NORMAL);
     ////////////////////// send video flow //////////////////////
-    bool videoFlow = true;
+    bool videoFlow{true};
+    bool fl{true};
+    int counter{0};
     while (videoFlow) {
         if (!camera.read(inputImage)) {
             waitKey(100);
             continue;
         }
 
-        imshow("camera image senser", inputImage);
-
         resize(inputImage, sendImage, Size(640, 480));
-        uchar *arr = sendImage.isContinuous()? sendImage.data: sendImage.clone().data;
+        if (fl) {
+            sendImage += 100;
+        }
+        fl = !fl;
+        imshow("camera image sender", sendImage);
+
+        cout << counter++ << endl;
+
+        uchar *arr = sendImage.isContinuous() ? sendImage.data: sendImage.clone().data;
 
         msg_buff.push_message_sync(static_cast<unsigned char*>(arr));
 
         // delay
-        char key = static_cast<char>(waitKey(50));
+        char key = static_cast<char>(waitKey(1000));
         if(key == 'q' || key == 'Q')
         {
             videoFlow = false;

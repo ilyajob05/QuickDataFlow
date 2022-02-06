@@ -74,6 +74,7 @@ public:
     {
         get_message_async(dst_buff);
         while (!get_message_async_is_complete()) {
+            //            printf("bump");
             ;
         }
     }
