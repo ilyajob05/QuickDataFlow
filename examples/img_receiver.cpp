@@ -58,14 +58,12 @@ int main(int argc, char *argv[])
     int counter{0};
     while (videoFlow) {
         //        memset(sw_buff, 0, 640 * 480 * 3);
-        msg_buff.get_message_sync(sw_buff);
-
-        while(!msg_buff.get_message_async_is_complete());
-
+        msg_buff.get_message_async(sw_buff);
 
         Mat inputImage(480, 640, CV_8UC3, sw_buff);
+        Mat buffImg = inputImage.clone();
 
-        imshow("camera image receiver", inputImage);
+        imshow("camera image receiver", buffImg);
         cout << counter++ << endl;
 
         // delay

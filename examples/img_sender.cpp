@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
         msg_buff.push_message_sync(static_cast<unsigned char*>(arr));
 
         // delay
-        char key = static_cast<char>(waitKey(1000));
+        char key = static_cast<char>(waitKey(5));
         if(key == 'q' || key == 'Q')
         {
             videoFlow = false;
