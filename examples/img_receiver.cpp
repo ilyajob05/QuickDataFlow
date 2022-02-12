@@ -19,8 +19,8 @@ using namespace cv;
 
 int main(int argc, char *argv[])
 {
-    MessageBuff msg_buff("img_sender_point_o",
-                         "img_sender_point_i",
+    MessageBuff msg_buff("img_sender_point_o_",
+                         "img_sender_point_i_",
                          10,
                          10,
                          640 * 480 * 3,
@@ -31,51 +31,18 @@ int main(int argc, char *argv[])
     ////////////////////// send video flow //////////////////////
     bool videoFlow = true;
     uchar img_buff[640 * 480 * 3];
-    uchar img_second_buff[640 * 480 * 3];
-    uchar *sw_buff = img_buff;
-    uchar *sw_old_buff = img_second_buff;
 
-//    while (videoFlow) {
-//        //        msg_buff.get_message_sync(msg_buff.buff.data());
-//        sw_buff = (sw_buff == img_buff) ? img_second_buff : img_buff;
-////        memset(sw_buff, 0, 640 * 480 * 3);
-//        msg_buff.get_message_sync(sw_buff);
-
-////        inputImage.data = img_buff;
-//        Mat inputImage(480, 640, CV_8UC3, sw_buff);
-
-//        imshow("camera image receiver", inputImage);
-//        // delay
-//        char key = static_cast<char>(waitKey(10));
-//        if (key == 'q' || key == 'Q') {
-//            videoFlow = false;
-//        }
-//        cout << '.' << endl;
-
-//        sw_old_buff = sw_buff;
-//    }
-
-    int counter{0};
     while (videoFlow) {
-        //        memset(sw_buff, 0, 640 * 480 * 3);
-        msg_buff.get_message_async(sw_buff);
-
-        Mat inputImage(480, 640, CV_8UC3, sw_buff);
-        Mat buffImg = inputImage.clone();
-
-        imshow("camera image receiver", buffImg);
-        cout << counter++ << endl;
+        msg_buff.get_message_sync(img_buff);
+        Mat inputImage(480, 640, CV_8UC3, img_buff);
+        imshow("camera image receiver", inputImage);
 
         // delay
-        char key = static_cast<char>(waitKey(5));
+        char key = static_cast<char>(waitKey(1));
         if (key == 'q' || key == 'Q') {
             videoFlow = false;
         }
-        cout << '.' << endl;
-
-        sw_old_buff = sw_buff;
     }
-
 
     return 0;
 }

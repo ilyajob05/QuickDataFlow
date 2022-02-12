@@ -12,6 +12,7 @@
 #include <array>
 #include <condition_variable>
 
+
 namespace fshm {
 
 class MessageBuff
@@ -50,10 +51,10 @@ public:
     /// user freandly function
     inline void push_message_sync(unsigned char *src_buff)
     {
-        push_message_async(src_buff);
-        while (!push_message_async_is_complete()) {
-            ;
+        while (!output_message_complete.load()) {
+            push_message_async(src_buff);
         }
+        output_message_complete.store(false);
     }
 
     /// user freandly function for MessageBuff::read_from_input()
@@ -73,10 +74,8 @@ public:
     /// user freandly function
     inline void get_message_sync(unsigned char *dst_buff)
     {
-        get_message_async(dst_buff);
         while (!input_message_complete.load()){
-            printf("bump\n");
-            ;
+            get_message_async(dst_buff);
         }
         input_message_complete.store(false);
     }

@@ -22,7 +22,7 @@ void idle(std::atomic_bool *event_exit)
     event_exit->store(true);
 }
 
-TEST(MessageBuff, output_message_waiter)
+TEST(MessageBuff, output_message_fill_full)
 {
     using namespace fshm;
     using namespace std;
@@ -33,10 +33,13 @@ TEST(MessageBuff, output_message_waiter)
 
     MessageBuff msg_buff("shmin", "shmin", 100, 100, sizeof(element1), sizeof(element2));
     // unlock thread for output
-    msg_buff.push_message_async(static_cast<unsigned char*> (element1.data()));
-    while(!msg_buff.push_message_async_is_complete());
-    msg_buff.get_message_async(static_cast<unsigned char*> (element2.data()));
-    while(!msg_buff.get_message_async_is_complete());
+    for (int i = 0; i < 50; i++) {
+        msg_buff.push_message_sync(static_cast<unsigned char *>(element1.data()));
+    }
+
+    for (int i = 0; i < 50; i++) {
+        msg_buff.get_message_sync(static_cast<unsigned char *>(element2.data()));
+    }
 
     shm_unlink("shmin");
 

@@ -18,8 +18,8 @@ using namespace cv;
 
 int main(int argc, char *argv[])
 {
-    MessageBuff msg_buff("img_sender_point_i",
-                         "img_sender_point_o",
+    MessageBuff msg_buff("img_sender_point_i_",
+                         "img_sender_point_o_",
                          10,
                          10,
                          640 * 480 * 3,
@@ -36,10 +36,9 @@ int main(int argc, char *argv[])
     Mat inputImage;
     Mat sendImage(480, 640, CV_8UC3);
     namedWindow("camera image sender", WINDOW_NORMAL);
+
     ////////////////////// send video flow //////////////////////
     bool videoFlow{true};
-    bool fl{true};
-    int counter{0};
     while (videoFlow) {
         if (!camera.read(inputImage)) {
             waitKey(100);
@@ -47,13 +46,7 @@ int main(int argc, char *argv[])
         }
 
         resize(inputImage, sendImage, Size(640, 480));
-        if (fl) {
-            sendImage += 100;
-        }
-        fl = !fl;
         imshow("camera image sender", sendImage);
-
-        cout << counter++ << endl;
 
         uchar *arr = sendImage.isContinuous() ? sendImage.data: sendImage.clone().data;
 

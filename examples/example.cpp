@@ -39,22 +39,18 @@ int main(int argc, char* argv[]) {
         element1[i] = uint8_t(i);
     }
 
-    cout << "start push" << endl;
-
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 5; i++) {
         msg_buff.push_message_sync(static_cast<unsigned char *>(element1.data()));
     }
 
-    cout << "end push" << endl;
-
     // check complete
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 5; i++) {
         msg_buff.get_message_sync(static_cast<unsigned char *>(element2.data()));
 
-        cout << "input_message_complete" << msg_buff.input_message_complete.load() << endl;
+        cout << "input_message_complete " << msg_buff.input_message_complete.load() << endl;
         cout << endl;
 
-        cout << "C:" << to_string(i) << "_____________" << endl;
+        cout << "C:" << to_string(i) << endl;
 
         if(0 != std::memcmp(static_cast<unsigned char*> (element1.data()), element2.data(), sizeof(element1))){
             cout << "error" << endl;

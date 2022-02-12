@@ -81,31 +81,12 @@ void MessageBuff::read_from_input(MessageBuff *self)
             break;
         }
 
-        //        self->input_message_complete.store(false);
-
         bool dequeue_result = self->shmemq_try_dequeue(self->queue_input.get(),
                                                        self->mem_src_element.load(),
                                                        self->element_size_in);
 
-        if (dequeue_result) {
-            self->input_message_complete.store(true);
-        }
-        else{
-            self->input_message_complete.store(false);
-        }
-
-        // unlock input_message_waiter from external process for next step
-        //        if (self->shmemq_try_dequeue(self->queue_input.get(),
-        //                                     self->mem_src_element.load(),
-        //                                     self->element_size_in)) {
-        //            self->input_message_complete.store(true);
-        //        }
-        //        else {
-        //            self->input_message_complete.store(false);
-        //        }
-        printf("read complete %i\n", dequeue_result);
+        self->input_message_complete.store(dequeue_result);
     }
-    printf("rfi exit");
 }
 
 void MessageBuff::write_to_out(MessageBuff *self)
@@ -115,16 +96,17 @@ void MessageBuff::write_to_out(MessageBuff *self)
     {
         std::unique_lock lck(self->output_message_waiter);
         self->output_message_cv.wait(lck, [&self]() { return self->output_message_ready; });
+
+        self->output_message_ready = false;
+
         if(self->thr_out_event_exit.load()){
             break;
         }
-        self->output_message_ready = false;
         // unlock output_message_waiter from external process for next step
-        self->output_message_complete.store(false);
-        self->shmemq_try_enqueue(self->queue_output.get(), self->mem_dst_element.load(), self->element_size_out);
-        self->output_message_complete.store(true);
+        bool enqueue_result = self->shmemq_try_enqueue(self->queue_output.get(), self->mem_dst_element.load(), self->element_size_out);
+
+        self->output_message_complete.store(enqueue_result);
     }
-    printf("wto exit");
 }
 
 void MessageBuff::clear_shmem_attr(shmemq_t *shmem)
