@@ -19,8 +19,8 @@ class MessageBuff
 public:
     std::mutex input_message_waiter;
     std::mutex output_message_waiter;
-    std::condition_variable input_message_cv;
-    std::condition_variable output_message_cv;
+    std::condition_variable input_message_cv;  /// for read data
+    std::condition_variable output_message_cv;/// for write data
     bool input_message_ready{false};
     bool output_message_ready{false};
 
@@ -56,7 +56,7 @@ public:
         }
     }
 
-    /// user freandly function
+    /// user freandly function for MessageBuff::read_from_input()
     inline void get_message_async(unsigned char *dst_buff)
     {
         {
@@ -66,6 +66,7 @@ public:
         }
         input_message_cv.notify_one();
     }
+
     /// user freandly function
     inline bool get_message_async_is_complete() { return input_message_complete.load(); }
 
@@ -73,10 +74,11 @@ public:
     inline void get_message_sync(unsigned char *dst_buff)
     {
         get_message_async(dst_buff);
-        while (!get_message_async_is_complete()) {
-            //            printf("bump");
+        while (!input_message_complete.load()){
+            printf("bump\n");
             ;
         }
+        input_message_complete.store(false);
     }
 
     virtual ~MessageBuff();

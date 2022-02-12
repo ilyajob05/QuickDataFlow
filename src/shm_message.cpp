@@ -73,22 +73,37 @@ void MessageBuff::read_from_input(MessageBuff *self)
     {
         std::unique_lock lck(self->input_message_waiter);
         self->input_message_cv.wait(lck, [&self]() { return self->input_message_ready; });
-        if(self->thr_in_event_exit.load()){
-            break;
-        }
+
         // lock input message cv
         self->input_message_ready = false;
 
-        self->input_message_complete.store(false);
-        // unlock input_message_waiter from external process for next step
-        if (self->shmemq_try_dequeue(self->queue_input.get(),
-                                     self->mem_src_element.load(),
-                                     self->element_size_in)) {
+        if(self->thr_in_event_exit.load()){
+            break;
+        }
+
+        //        self->input_message_complete.store(false);
+
+        bool dequeue_result = self->shmemq_try_dequeue(self->queue_input.get(),
+                                                       self->mem_src_element.load(),
+                                                       self->element_size_in);
+
+        if (dequeue_result) {
             self->input_message_complete.store(true);
         }
-        else {
+        else{
             self->input_message_complete.store(false);
         }
+
+        // unlock input_message_waiter from external process for next step
+        //        if (self->shmemq_try_dequeue(self->queue_input.get(),
+        //                                     self->mem_src_element.load(),
+        //                                     self->element_size_in)) {
+        //            self->input_message_complete.store(true);
+        //        }
+        //        else {
+        //            self->input_message_complete.store(false);
+        //        }
+        printf("read complete %i\n", dequeue_result);
     }
     printf("rfi exit");
 }

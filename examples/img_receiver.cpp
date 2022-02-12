@@ -60,6 +60,9 @@ int main(int argc, char *argv[])
         //        memset(sw_buff, 0, 640 * 480 * 3);
         msg_buff.get_message_sync(sw_buff);
 
+        while(!msg_buff.get_message_async_is_complete());
+
+
         Mat inputImage(480, 640, CV_8UC3, sw_buff);
 
         imshow("camera image receiver", inputImage);
