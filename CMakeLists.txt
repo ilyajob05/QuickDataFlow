@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(QuickDataFlow)
+project(QuickDataFlow VERSION "1.2.0")
 
 
 ################# compiler config #################
@@ -60,3 +60,11 @@ if(BUILD_TESTS)
     ################# create gtest targets #################
     add_test(${CMAKE_PROJECT_NAME}_test, ${CMAKE_PROJECT_NAME}_test)
 endif()
+
+################# configure for install #################
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/shm_message.hpp" DESTINATION "/usr/include")
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/build/libQuickDataFlow.so" DESTINATION "/usr/lib")
+
+SET(CPACK_GENERATOR "DEB")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "ilyajob05") #required
+INCLUDE(CPack)
