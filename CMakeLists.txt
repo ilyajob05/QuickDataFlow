@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(QuickDataFlow VERSION "1.2.0")
+project(QuickDataFlow VERSION "2.0.0")
 
 
 ################# compiler config #################

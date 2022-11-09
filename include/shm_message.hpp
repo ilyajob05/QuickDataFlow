@@ -11,13 +11,16 @@
 #include <functional>
 #include <array>
 #include <condition_variable>
+#include <unistd.h>
 
 #include <iostream>
 
 
 namespace fshm
 {
-
+    ///
+    /// \brief The MessageBuff class
+    ///
     class MessageBuff
     {
         public:
@@ -180,17 +183,17 @@ namespace fshm
 
             std::function<void(uint32_t)> cb; /// callback function for read input data
 
-            /// generate shared memory attributes
+            /// \brief generate shared memory attributes
             /// \param name name shared memory descriptor
             /// \param max_count max size of memory buffer
             /// \param element_size size for one element
             std::unique_ptr<shmemq_t> shmemq_new(char const* name, size_t q_size, size_t element_size);
-            /// copy data src to shred memory
+            /// \brief copy data src to shred memory
             /// \param self shared memory descriptor
             /// \param src data source
             /// \param len is element size of buffer for write to memory
             bool shmemq_try_enqueue(shmemq_t* self, unsigned char* dst, unsigned int len);
-            /// copy shared memory to dst
+            /// \brief copy shared memory to dst
             /// \param self shared memory descriptor
             /// \param dst data destination
             /// \param len is element size of buffer for read from memory
@@ -207,3 +210,4 @@ namespace fshm
             void clear_mem_buffer(shmemq_t* self);
     };
 }
+

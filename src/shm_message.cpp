@@ -3,7 +3,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <pthread.h>
 #include <errno.h>
 
@@ -248,5 +247,55 @@ namespace fshm
         }
 
         free(self->name);
+    }
+}
+
+
+
+extern "C" {
+    fshm::MessageBuff* MessageBuff_new(const char* shm_src_name, const char* shm_dst_name,
+                                       const size_t q_size_in_, const size_t q_size_out_,
+                                       const size_t element_size_in_, const size_t element_size_out_,
+                                       const u_int32_t read_cycle_delay_us_ = 1000,
+                                       bool clear_buffer_in = true, bool clear_buffer_out = true)
+    {
+        return new fshm::MessageBuff(shm_src_name, shm_dst_name, q_size_in_, q_size_out_,
+                                     element_size_in_, element_size_out_, read_cycle_delay_us_,
+                                     clear_buffer_in, clear_buffer_out);
+    }
+
+    void MessageBuff_delete(fshm::MessageBuff* mb)
+    {
+        delete mb;
+    }
+
+    const size_t MessageBuff_len_get(fshm::MessageBuff* mb)
+    {
+        return mb->len_get();
+    }
+
+    const size_t MessageBuff_q_size_in_get(fshm::MessageBuff* mb)
+    {
+        return mb->q_size_in_get();
+    }
+
+    const char* MessageBuff_in_name_get(fshm::MessageBuff* mb)
+    {
+        return mb->shm_in_name_get();
+    }
+
+    const char* MessageBuff_out_name_get(fshm::MessageBuff* mb)
+    {
+        return mb->shm_out_name_get();
+    }
+
+    void MessageBuff_push_msg_sync(fshm::MessageBuff* mb, unsigned char* buff)
+    {
+        mb->push_message_sync(buff);
+    }
+
+    void MessageBuff_get_msg_sync(fshm::MessageBuff* mb, unsigned char* buff)
+    {
+        mb->get_message_sync(buff);
     }
 }
