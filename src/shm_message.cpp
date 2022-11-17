@@ -159,8 +159,6 @@ namespace fshm
             }
         }
 
-        printf("initialized queue %s, created = %d\n", name, created);
-
         if (created && (-1 == ftruncate(self->shmem_fd, self->mmap_size))) {
             clear_shmem_attr(self.get());
             return nullptr;
@@ -187,6 +185,7 @@ namespace fshm
             // TODO Need to clean up the mutex? Also, maybe mark it as robust? (pthread_mutexattr_setrobust)
         }
 
+        printf("initialized queue %s, created = %d\n", name, created);
         return self;
     }
 

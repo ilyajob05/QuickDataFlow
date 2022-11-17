@@ -1,3 +1,5 @@
+import os
+import sys
 import ctypes as ct
 
 
@@ -9,7 +11,15 @@ PMessageBuff = ct.POINTER(_MessageBuff)
 
 
 class MessageBuff:
-    _dll = ct.CDLL('/home/ilya/PRJ/QuickDataFlow/build/libQuickDataFlow.so')
+    self_path = os.path.dirname(__file__)
+    lib_path = os.path.join(self_path, "build/libQuickDataFlow.so")
+    if not os.path.exists(lib_path):
+        lib_path = "/usr/lib/QuickDataFlow/libQuickDataFlow.so"
+        if not os.path.exists(lib_path):
+            sys.stderr(f'lib path is not exist: {lib_path}')
+            sys.exit()
+    _dll = ct.CDLL(lib_path)
+
     _dll.MessageBuff_new.argtypes = ct.POINTER(ct.c_char), ct.POINTER(ct.c_char),
     ct.c_size_t, ct.c_size_t, ct.c_size_t, ct.c_size_t, ct.c_uint32, ct.c_bool, ct.c_bool
     _dll.MessageBuff_new.restype = PMessageBuff

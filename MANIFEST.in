@@ -1,0 +1,11 @@
+include MANIFEST.in
+include setup.py
+include setup.cfg
+include README.md
+include LICENSE
+graft include
+graft src
+include CMakeLists.txt
+include QuickDataFlow/__init__.py
+include QuickDataFlow/shm_message.py
+include QuickDataFlow/build/*.so
