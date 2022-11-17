@@ -47,3 +47,4 @@ if __name__ == '__main__':
         # package_data={"QuickDataFlow": ["_precompiled_extension.pyd"]},
         has_ext_modules=lambda: True
 )
+

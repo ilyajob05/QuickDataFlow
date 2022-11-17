@@ -9,3 +9,4 @@ include CMakeLists.txt
 include QuickDataFlow/__init__.py
 include QuickDataFlow/shm_message.py
 include QuickDataFlow/build/*.so
+include build/*.so
