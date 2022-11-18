@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
     // create a buffer for data transfer
     MessageBuff msg_buff("img_sender_point_i_", "img_sender_point_o_",
                          10, 10, 640 * 480 * 3, 640 * 480 * 3);
-    Mat inputImage = imread("/home/ilya/PRJ/QuickDataFlow/data/test-image-1.png");
+    Mat inputImage = imread("../data/test-image-1.png");
     Mat sendImage(480, 640, CV_8UC3);
     resize(inputImage, sendImage, Size(640, 480));
     cvtColor(sendImage, sendImage, COLOR_BGR2RGB); // for PIL
