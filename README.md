@@ -44,38 +44,36 @@ pip install QuickDataFlow-2.1.2.tar.gz
 ### C++
 ```cpp
 #include <opencv2/opencv.hpp>
-#include "QuickDataFlow/shm_message.hpp"
+#include "shm_message.hpp"
 
 using namespace fshm;
 using namespace std;
 using namespace cv;
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     // create a buffer for data transfer
     MessageBuff msg_buff("img_sender_point_i_", "img_sender_point_o_",
                          10, 10, 640 * 480 * 3, 640 * 480 * 3);
-
-    Mat inputImage = imread("data/test-image-1.png");
+    Mat inputImage = imread("/home/ilya/PRJ/QuickDataFlow/data/test-image-1.png");
     Mat sendImage(480, 640, CV_8UC3);
     resize(inputImage, sendImage, Size(640, 480));
+    cvtColor(sendImage, sendImage, COLOR_BGR2RGB); // for PIL
     namedWindow("camera image sender", WINDOW_NORMAL);
-    imshow("camera image sender", sendImage);
-    
     // send data
-    unsigned char *arr = sendImage.isContinuous() ? sendImage.data: sendImage.clone().data;
+    uchar* arr = sendImage.isContinuous() ? sendImage.data : sendImage.clone().data;
     msg_buff.push_message_sync(static_cast<unsigned char*>(arr));
-
+    imshow("camera image sender", inputImage);
+    waitKey(10000);
     return 0;
 }
-
 ```
 ### Python
 ```python
 from PIL import Image
 from QuickDataFlow import shm_message as sm
 
-mb_buff = sm.MessageBuff("img_sender_point_o_", "img_sender_point_i_", 
+mb_buff = sm.MessageBuff("img_sender_point_o_", "img_sender_point_i_",
                          10, 10, 640 * 480 * 3, 640 * 480 * 3)
 buff = bytes([0] * (640 * 480 * 3))
 mb_buff.get_msg(buff)

@@ -39,11 +39,13 @@ target_link_libraries(example ${CMAKE_PROJECT_NAME} -lrt -lpthread)
         include_directories(${OpenCV_INCLUDE_DIRS})
         ################# create examples app #################
         add_executable(img_sender ${CMAKE_CURRENT_SOURCE_DIR}/examples/img_sender.cpp)
-        add_executable(img_receiver ${CMAKE_CURRENT_SOURCE_DIR}/examples/img_receiver.cpp)
+        add_executable(video_sender ${CMAKE_CURRENT_SOURCE_DIR}/examples/video_sender.cpp)
+        add_executable(video_receiver ${CMAKE_CURRENT_SOURCE_DIR}/examples/video_receiver.cpp)
         ################# link connect #################
         # OpenCV
         target_link_libraries(img_sender ${CMAKE_PROJECT_NAME} ${OpenCV_LIBS} -lrt -lpthread)
-        target_link_libraries(img_receiver ${CMAKE_PROJECT_NAME} ${OpenCV_LIBS} -lrt -lpthread)
+        target_link_libraries(video_sender ${CMAKE_PROJECT_NAME} ${OpenCV_LIBS} -lrt -lpthread)
+        target_link_libraries(video_receiver ${CMAKE_PROJECT_NAME} ${OpenCV_LIBS} -lrt -lpthread)
     endif()
     
 endif()
